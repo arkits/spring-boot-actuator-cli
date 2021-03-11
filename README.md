@@ -5,7 +5,11 @@
 ## Usage
 
 ```bash
-$ ./sba-cli info
+$ ./sba-cli info -U http://localhost:8080
+
+{
+    "title": "user-service"
+}
 ```
 
 ## Development

@@ -31,8 +31,6 @@ func PrintActuatorEnv(inventory Inventory) error {
 	// Make the HTTP call
 	response, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
 
-	fmt.Println("")
-
 	// Print out the good stuff
 	fmt.Println("")
 	PrettyPrintJSON(response)

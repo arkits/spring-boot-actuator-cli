@@ -12,7 +12,7 @@ import (
 func PrintActuatorInfo(inventory Inventory) error {
 
 	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/actuator/info")
+	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/info")
 
 	// Make the HTTP call
 	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
@@ -30,7 +30,7 @@ func PrintActuatorInfo(inventory Inventory) error {
 func PrintActuatorEnv(inventory Inventory) error {
 
 	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/actuator/env")
+	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/env")
 
 	// Make the HTTP call
 	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
@@ -51,6 +51,24 @@ func PrintActuatorEnv(inventory Inventory) error {
 		{"activeProfiles", marshalledResponseJSON["activeProfiles"]},
 	})
 	t.Render()
+
+	return nil
+
+}
+
+// PrintGenericActuatorResponse retrieves data from a generic actuator endpoint and prints it out
+func PrintGenericActuatorResponse(inventory Inventory, endpoint string) error {
+
+	// Setup and validate the params
+	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
+
+	// Make the HTTP call
+	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
+
+	// Print out the good stuff
+	fmt.Println("")
+	PrettyPrintJSON(strResponseJSON)
+	fmt.Println("")
 
 	return nil
 

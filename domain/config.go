@@ -10,8 +10,9 @@ import (
 
 // Config defines the utility's config
 type Config struct {
-	Verbose   bool        `yaml:"verbose"`
-	Inventory []Inventory `yaml:"inventory"`
+	Verbose                bool `yaml:"verbose"`
+	ActuatorEndpointPrefix string
+	Inventory              []Inventory `yaml:"inventory"`
 }
 
 // Inventory defines properties related to single Spring Boot application
@@ -30,6 +31,8 @@ func SetupConfig(cmd *cobra.Command) {
 
 	viper.BindPFlag("verbose", cmd.Flags().Lookup("verbose"))
 
+	viper.SetDefault("actuatorEndpointPrefix", "actuator")
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -43,7 +46,7 @@ func SetupConfig(cmd *cobra.Command) {
 		fmt.Errorf("Unable to decode into struct - %v", err)
 	}
 
-	if lookupFlagInCmd("specific", cmd) {
+	if LookupFlagInCmd("specific", cmd) {
 
 		// Get the input string
 		specific := cmd.Flags().Lookup("specific").Value.String()
@@ -71,7 +74,7 @@ func SetupConfig(cmd *cobra.Command) {
 
 	// Check if flags for impromptu definition of an Inventory were passed
 	// Assume that if baseURL was passed, then it is an impromptu definition
-	if lookupFlagInCmd("baseURL", cmd) {
+	if LookupFlagInCmd("baseURL", cmd) {
 
 		fmt.Println("baseURL was there")
 
@@ -79,13 +82,13 @@ func SetupConfig(cmd *cobra.Command) {
 		impromptuInventory.Name = ""
 		impromptuInventory.BaseURL = cmd.Flags().Lookup("baseURL").Value.String()
 
-		if lookupFlagInCmd("authorizationHeader", cmd) {
+		if LookupFlagInCmd("authorizationHeader", cmd) {
 			impromptuInventory.AuthorizationHeader = cmd.Flags().Lookup("authorizationHeader").Value.String()
 		}
 
 		fmt.Printf("skipVerifySSL=%v", cmd.Flags().Lookup("skipVerifySSL").Value.String())
 
-		if lookupFlagInCmd("skipVerifySSL", cmd) {
+		if LookupFlagInCmd("skipVerifySSL", cmd) {
 			// impromptuInventory.SkipVerifySSL = false
 		}
 
@@ -98,7 +101,8 @@ func SetupConfig(cmd *cobra.Command) {
 
 }
 
-func lookupFlagInCmd(flagName string, cmd *cobra.Command) bool {
+// LookupFlagInCmd returns whether a flag is set in the cmd
+func LookupFlagInCmd(flagName string, cmd *cobra.Command) bool {
 
 	// I'm not sure about this...
 	value := cmd.Flags().Lookup(flagName).Value.String()

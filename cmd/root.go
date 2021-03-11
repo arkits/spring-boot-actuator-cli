@@ -23,12 +23,16 @@ func init() {
 	addCommonFlags(infoCmd)
 	addCommonFlags(envCmd)
 	addCommonFlags(inventoryCmd)
+	addCommonFlags(customCmd)
+
+	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
 
 	// Add the commands
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(infoCmd)
 	rootCmd.AddCommand(envCmd)
 	rootCmd.AddCommand(inventoryCmd)
+	rootCmd.AddCommand(customCmd)
 
 }
 

@@ -35,6 +35,8 @@ func init() {
 func addCommonFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("verbose", "V", false, "Set whether to output verbose log")
 
+	cmd.Flags().StringP("specific", "S", "", "Name of a specific Inventory")
+
 	// Flags for impromptu definition of an Inventory
 	cmd.Flags().StringP("baseURL", "U", "", "URL of the target Spring Boot app")
 	cmd.Flags().StringP("authorizationHeader", "H", "", "Authorization Header to use when making the HTTP call")

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,6 +43,32 @@ func SetupConfig(cmd *cobra.Command) {
 		fmt.Errorf("Unable to decode into struct - %v", err)
 	}
 
+	if lookupFlagInCmd("specific", cmd) {
+
+		// Get the input string
+		specific := cmd.Flags().Lookup("specific").Value.String()
+
+		// Multiple name can be pass with a ','
+		specificNames := strings.Split(specific, ",")
+
+		var specificInventory []Inventory
+
+		// Filter out the inventory based on the specific names
+		for _, name := range specificNames {
+
+			// TODO: this needs to be switched with a hash-map lookup to handle larger inventories
+			inventory := getInventoryByName(name)
+
+			if inventory.BaseURL != "" {
+				specificInventory = append(specificInventory, inventory)
+			}
+
+		}
+
+		CLIConfig.Inventory = specificInventory
+
+	}
+
 	// Check if flags for impromptu definition of an Inventory were passed
 	// Assume that if baseURL was passed, then it is an impromptu definition
 	if lookupFlagInCmd("baseURL", cmd) {
@@ -80,4 +107,18 @@ func lookupFlagInCmd(flagName string, cmd *cobra.Command) bool {
 		return false
 	}
 	return true
+}
+
+func getInventoryByName(name string) Inventory {
+
+	var inventory Inventory
+
+	for _, i := range CLIConfig.Inventory {
+		if i.Name == name {
+			return i
+		}
+	}
+
+	return inventory
+
 }

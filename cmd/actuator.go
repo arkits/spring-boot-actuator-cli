@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/arkits/spring-boot-actuator-cli/domain"
 	"github.com/spf13/cobra"
 )
@@ -12,12 +10,12 @@ var infoCmd = &cobra.Command{
 	Short: "Interface with /actuator/info",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		domain.SetupConfig()
+		domain.SetupConfig(cmd)
 
-		// targetBase := cmd.Flags().Lookup("target").Value.String()
-		// viper.BindPFlag("verbose", cmd.Flags().Lookup("verbose"))
+		for _, inventory := range domain.CLIConfig.Inventory {
+			domain.PrintActuatorInfo(inventory)
+		}
 
-		// domain.GetActuatorInfo(targetBase)
 	},
 }
 
@@ -26,10 +24,10 @@ var envCmd = &cobra.Command{
 	Short: "Interface with /actuator/env",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		fmt.Println("")
+		domain.SetupConfig(cmd)
 
-		targetBase := cmd.Flags().Lookup("target").Value.String()
-
-		domain.GetActuatorInfo(targetBase)
+		for _, inventory := range domain.CLIConfig.Inventory {
+			domain.PrintActuatorEnv(inventory)
+		}
 	},
 }

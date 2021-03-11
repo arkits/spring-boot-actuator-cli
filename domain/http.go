@@ -1,21 +1,21 @@
 package domain
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 var httpClient = &http.Client{
 	Timeout: time.Second * 5,
 }
 
-func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader string) (string, error) {
+// MakeHTTPCall is a wrapper function to aid performing an HTTP call
+func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader string, skipVerifySSL bool) (string, error) {
 
 	var responseBodyStr string
 
@@ -26,14 +26,24 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 		return responseBodyStr, err
 	}
 
-	// Add the Headers
-	request.Header.Add("Content-Type", "application/json; charset=utf-8")
+	// Set the Headers
+	request.Header.Set("Content-Type", "application/json; charset=utf-8")
+	request.Header.Set("User-Agent", "sba-cli/1.0")
 
 	if authorizationHeader != "" {
 		request.Header.Add("Authorization", authorizationHeader)
 	}
 
-	if viper.GetBool("verbose") {
+	// Handle skipping SSL verification
+	if skipVerifySSL {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		httpClient.Transport = tr
+	}
+
+	// Explicitly print out the outgoing HTTP call
+	if CLIConfig.Verbose {
 		fmt.Printf(">>> %s %s \n", request.Method, request.URL)
 	}
 
@@ -54,15 +64,20 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 
 	responseBodyStr = string(responseBody)
 
+	if CLIConfig.Verbose {
+		fmt.Printf(">>> %s %s \n", response.Status, response.Proto)
+	}
+
 	return responseBodyStr, nil
 
 }
 
-func GenerateRequestURL(requestBase string, pathToAppend string) (string, error) {
+// GenerateRequestURL is a utility function to cleanly generate a URL based on the passed baseURL and path
+func GenerateRequestURL(baseURL string, pathToAppend string) (string, error) {
 
 	var generatedRequestURL string
 
-	u, err := url.Parse(requestBase)
+	u, err := url.Parse(baseURL)
 	if err != nil {
 		return generatedRequestURL, err
 	}

@@ -4,3 +4,4 @@ inventory:
   - name: user-service
     baseURL: http://localhost:8080
     authorizationHeader: Basic YXJraXRzOmh1bnRlcjI=
+    skipVerifySSL: true

@@ -13,7 +13,7 @@ var inventoryCmd = &cobra.Command{
 	Short: "Prints the parsed Inventory",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		domain.SetupConfig()
+		domain.SetupConfig(cmd)
 
 		color.Cyan(">>> Parsed Inventory")
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/arkits/spring-boot-actuator-cli/domain"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +14,7 @@ var inventoryCmd = &cobra.Command{
 
 		domain.SetupConfig(cmd)
 
-		color.Cyan(">>> Parsed Inventory")
+		fmt.Println(">>> Parsed Inventory")
 
 		for _, inventory := range domain.CLIConfig.Inventory {
 

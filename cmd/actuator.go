@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/arkits/spring-boot-actuator-cli/domain"
 	"github.com/spf13/cobra"
@@ -42,14 +43,16 @@ var customCmd = &cobra.Command{
 		domain.SetupConfig(cmd)
 
 		if !domain.LookupFlagInCmd("endpoint", cmd) {
-			fmt.Println("Endpoint not set!")
+			fmt.Fprintf(os.Stderr, ">>> ERROR >>> No endpoint was passed. \n")
+			fmt.Fprintf(os.Stderr, "Please define the path ID of the custom actuator endpoint. \n")
+			os.Exit(1)
 			return
 		}
 
 		endpoint := cmd.Flags().Lookup("endpoint").Value.String()
 
 		for _, inventory := range domain.CLIConfig.Inventory {
-			domain.PrintGenericActuatorResponse(inventory, endpoint)
+			domain.PrintActuatorCustom(inventory, endpoint)
 		}
 	},
 }

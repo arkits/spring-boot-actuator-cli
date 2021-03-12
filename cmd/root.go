@@ -45,4 +45,5 @@ func addCommonFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("baseURL", "U", "", "URL of the target Spring Boot app")
 	cmd.Flags().StringP("authorizationHeader", "H", "", "Authorization Header to use when making the HTTP call")
 	cmd.Flags().BoolP("skipVerifySSL", "K", false, "Skip verification of SSL")
+	cmd.Flags().BoolP("skip-pretty-print", "", false, "Skip any pretty printing")
 }

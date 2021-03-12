@@ -12,6 +12,7 @@ import (
 type Config struct {
 	Verbose                bool `yaml:"verbose"`
 	ActuatorEndpointPrefix string
+	SkipPrettyPrint        bool
 	Inventory              []Inventory `yaml:"inventory"`
 }
 
@@ -29,9 +30,11 @@ var CLIConfig Config
 // SetupConfig sets up the Config based on the config file and any passed params
 func SetupConfig(cmd *cobra.Command) {
 
-	viper.BindPFlag("verbose", cmd.Flags().Lookup("verbose"))
+	viper.BindPFlag("Verbose", cmd.Flags().Lookup("verbose"))
 
-	viper.SetDefault("actuatorEndpointPrefix", "actuator")
+	viper.BindPFlag("SkipPrettyPrint", cmd.Flags().Lookup("skip-pretty-print"))
+
+	viper.SetDefault("ActuatorEndpointPrefix", "actuator")
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")

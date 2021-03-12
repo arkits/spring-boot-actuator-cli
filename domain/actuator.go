@@ -8,19 +8,44 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+// GenericGetActuatorResponse retrieves data from a generic actuator endpoint and returns the response as a string
+// TODO: perform better error handling to top
+func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, error) {
+
+	// Setup and validate the params
+	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
+
+	return MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
+
+}
+
+// PrintActuatorCustom retrieves data a custom /actuator endpoint and prints it based on the passed params
+func PrintActuatorCustom(inventory Inventory, endpoint string) error {
+
+	strResponse, _ := GenericGetActuatorResponse(inventory, endpoint)
+
+	if CLIConfig.SkipPrettyPrint {
+		fmt.Println(strResponse)
+		return nil
+	}
+
+	PrettyPrintJSON(strResponse)
+
+	return nil
+
+}
+
 // PrintActuatorInfo retrieves data from /actuator/info and prints it out
 func PrintActuatorInfo(inventory Inventory) error {
 
-	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/info")
+	strResponse, _ := GenericGetActuatorResponse(inventory, "info")
 
-	// Make the HTTP call
-	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
+	if CLIConfig.SkipPrettyPrint {
+		fmt.Println(strResponse)
+		return nil
+	}
 
-	// Print out the good stuff
-	fmt.Println("")
-	PrettyPrintJSON(strResponseJSON)
-	fmt.Println("")
+	PrettyPrintJSON(strResponse)
 
 	return nil
 
@@ -29,17 +54,15 @@ func PrintActuatorInfo(inventory Inventory) error {
 // PrintActuatorEnv retrieves data from /actuator/env and prints it out
 func PrintActuatorEnv(inventory Inventory) error {
 
-	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/env")
+	strResponse, _ := GenericGetActuatorResponse(inventory, "env")
 
-	// Make the HTTP call
-	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
-
-	// Print out the good stuff
-	fmt.Println("")
+	if CLIConfig.SkipPrettyPrint {
+		fmt.Println(strResponse)
+		return nil
+	}
 
 	var marshalledResponseJSON map[string]interface{}
-	if err := json.Unmarshal([]byte(strResponseJSON), &marshalledResponseJSON); err != nil {
+	if err := json.Unmarshal([]byte(strResponse), &marshalledResponseJSON); err != nil {
 		panic(err)
 	}
 
@@ -51,24 +74,6 @@ func PrintActuatorEnv(inventory Inventory) error {
 		{"activeProfiles", marshalledResponseJSON["activeProfiles"]},
 	})
 	t.Render()
-
-	return nil
-
-}
-
-// PrintGenericActuatorResponse retrieves data from a generic actuator endpoint and prints it out
-func PrintGenericActuatorResponse(inventory Inventory, endpoint string) error {
-
-	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
-
-	// Make the HTTP call
-	strResponseJSON, _ := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
-
-	// Print out the good stuff
-	fmt.Println("")
-	PrettyPrintJSON(strResponseJSON)
-	fmt.Println("")
 
 	return nil
 

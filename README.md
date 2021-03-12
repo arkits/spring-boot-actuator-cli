@@ -17,6 +17,21 @@ $ ./sba-cli info -U http://localhost:8080
 }
 ```
 
+sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently support endpoints are - `info`, `env`.
+
+Users can still reach unsupported or custom endpoints and make use of the Inventory functionality by using the `custom` command.
+
+```bash
+# ./sba-cli custom -E <endpoint to the custom command> -U <baseURL to your app> --skip-pretty-print
+$ ./sba-cli custom -E prometheus -U http://localhost:8080 --skip-pretty-print
+
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+jvm_buffer_total_capacity_bytes{application="user-service",id="mapped",} 0.0
+jvm_buffer_total_capacity_bytes{application="user-service",id="direct",} 81920.0
+...
+```
+
 ### Inventory
 
 Chances are that you are managing multiple micro-services. sba-cli is designed to support this is use case by allowing the user to supply an Inventory. An Inventory can be defined in a `config.yaml` that must be placed in the same directory as sba-cli. Refer to the [config.sample.yaml](./config.sample.yaml)

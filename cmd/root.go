@@ -7,7 +7,7 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "sba-cli",
-		Short: "A CLI app to interface with Spring Boot's Actuator Endpoint",
+		Short: "A CLI utility to work with Spring Boot's Actuator Endpoint",
 	}
 
 	inventoryFileName string

@@ -31,10 +31,13 @@ var CLIConfig Config
 func SetupConfig(cmd *cobra.Command) {
 
 	viper.BindPFlag("Verbose", cmd.Flags().Lookup("verbose"))
-
 	viper.BindPFlag("SkipPrettyPrint", cmd.Flags().Lookup("skip-pretty-print"))
 
-	viper.SetDefault("ActuatorEndpointPrefix", "actuator")
+	if LookupFlagInCmd("actuator-base", cmd) {
+		viper.BindPFlag("ActuatorEndpointPrefix", cmd.Flags().Lookup("actuator-base"))
+	} else {
+		viper.SetDefault("ActuatorEndpointPrefix", "actuator")
+	}
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")

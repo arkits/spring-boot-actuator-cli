@@ -44,6 +44,10 @@ func addCommonFlags(cmd *cobra.Command) {
 	// Flags for impromptu definition of an Inventory
 	cmd.Flags().StringP("url", "U", "", "URL of the target Spring Boot app")
 	cmd.Flags().StringP("auth-header", "H", "", "Authorization Header to use when making the HTTP call")
+
+	// Other Misc Behavior
+	cmd.Flags().StringP("actuator-base", "B", "actuator", "Base of the actuator endpoint")
 	cmd.Flags().BoolP("skip-verify-ssl", "K", false, "Skip verification of SSL")
 	cmd.Flags().BoolP("skip-pretty-print", "", false, "Skip any pretty printing")
+
 }

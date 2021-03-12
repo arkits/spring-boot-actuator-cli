@@ -47,6 +47,22 @@ $ ./sba-cli info -S user-service
 }
 ```
 
+### Debugging with Verbose
+
+```bash
+$ ./sba-cli custom -V \
+    --url http://localhost:8080 \
+    --auth-header "Basic YXJraXRzOmh1bnRlcjI=" \
+    --endpoint health
+>>> url was set... assuming impromptu definition
+>>> GET http://localhost:8080
+>>> Authorization: Basic YXJraXRzOmh1bnRlcjI=
+>>> Proto: HTTP/1.1 Status: 200
+{
+  "status": "UP"
+}
+```
+
 ## Development
 
 ### Building + Running Locally

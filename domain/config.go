@@ -10,10 +10,10 @@ import (
 
 // Config defines the utility's config
 type Config struct {
-	Verbose                bool `yaml:"verbose"`
+	Verbose                bool
 	ActuatorEndpointPrefix string
 	SkipPrettyPrint        bool
-	Inventory              []Inventory `yaml:"inventory"`
+	Inventory              []Inventory
 }
 
 // Inventory defines properties related to single Spring Boot application
@@ -76,23 +76,23 @@ func SetupConfig(cmd *cobra.Command) {
 	}
 
 	// Check if flags for impromptu definition of an Inventory were passed
-	// Assume that if baseURL was passed, then it is an impromptu definition
-	if LookupFlagInCmd("baseURL", cmd) {
+	// Assume that if url was passed, then it is an impromptu definition
+	if LookupFlagInCmd("url", cmd) {
 
-		fmt.Println("baseURL was there")
-
-		var impromptuInventory Inventory
-		impromptuInventory.Name = ""
-		impromptuInventory.BaseURL = cmd.Flags().Lookup("baseURL").Value.String()
-
-		if LookupFlagInCmd("authorizationHeader", cmd) {
-			impromptuInventory.AuthorizationHeader = cmd.Flags().Lookup("authorizationHeader").Value.String()
+		if CLIConfig.Verbose {
+			fmt.Println(">>> url was set... assuming impromptu definition")
 		}
 
-		fmt.Printf("skipVerifySSL=%v", cmd.Flags().Lookup("skipVerifySSL").Value.String())
+		var impromptuInventory Inventory
+		impromptuInventory.Name = "unset"
+		impromptuInventory.BaseURL = cmd.Flags().Lookup("url").Value.String()
 
-		if LookupFlagInCmd("skipVerifySSL", cmd) {
-			// impromptuInventory.SkipVerifySSL = false
+		if LookupFlagInCmd("auth-header", cmd) {
+			impromptuInventory.AuthorizationHeader = cmd.Flags().Lookup("auth-header").Value.String()
+		}
+
+		if LookupFlagInCmd("skip-verify-ssl", cmd) {
+			impromptuInventory.SkipVerifySSL = true
 		}
 
 		var singleInventory []Inventory

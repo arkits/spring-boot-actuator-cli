@@ -52,7 +52,13 @@ func SetupConfig(cmd *cobra.Command) {
 		fmt.Errorf("Unable to decode into struct - %v", err)
 	}
 
+	// Build out the Inventory
+	// From here we attempt to figure what Inventory the user wishes to use
+
+	// If the specific flag is passed, then we use that to build the Inventory
 	if LookupFlagInCmd("specific", cmd) {
+
+		// Specific flag's parsing logic...
 
 		// Get the input string
 		specific := cmd.Flags().Lookup("specific").Value.String()

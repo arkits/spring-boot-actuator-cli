@@ -4,7 +4,9 @@ sba-cli is a command-line utility to work with a [Spring Boot](https://spring.io
 
 ## Usage
 
-### Most Basic
+### Quick Start
+
+sba-cli is available as a stand-alone binary. Pre-built binaries are available in the [Releases](https://github.com/arkits/spring-boot-actuator-cli/releases).
 
 The most basic usage of sba-cli is to check the info of a Spring Boot app.
 
@@ -44,6 +46,20 @@ $ ./sba-cli info -S user-service
 
 {
     "title": "user-service"
+}
+```
+
+Multiple specific services can be passed as a comma-separated string. sba-cli will iterate and print the responses for each.
+
+```bash
+$ ./sba-cli info -S user-service,order-service
+
+{
+    "title": "user-service"
+}
+
+{
+    "title": "order-service"
 }
 ```
 

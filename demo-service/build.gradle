@@ -1,0 +1,35 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'com.gorylenko.gradle-git-properties' version '2.2.4'
+}
+
+group = 'xyz.archit'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+	implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.6.4'
+
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// Customize Git properties plugin.
+gitProperties {
+    // Change date format in git.properties file.
+    dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+    dateFormatTimeZone = 'GMT'
+}

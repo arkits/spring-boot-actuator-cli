@@ -133,7 +133,7 @@ func PrintActuatorEnv(inventory Inventory) error {
 					continue
 				}
 
-				prettyVK := fmt.Sprintf("%v", v_v)
+				prettyVK := fmt.Sprintf("%q", v_v)
 				prettyVK = text.WrapHard(prettyVK, 75)
 
 				t.AppendRows([]table.Row{

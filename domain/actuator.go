@@ -86,13 +86,15 @@ func PrintActuatorEnv(inventory Inventory) error {
 
 	reader := dynamicstruct.NewReader(instance)
 
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+
 	// activeProfiles table
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
 	t.SetAllowedRowLength(200)
 	t.AppendHeader(table.Row{
-		"Active Profiles",
+		text.Bold.Sprint("Active Profiles"),
 	})
 	for _, profileName := range reader.GetField("ActiveProfiles").Interface().([]string) {
 		t.AppendRows([]table.Row{
@@ -107,7 +109,12 @@ func PrintActuatorEnv(inventory Inventory) error {
 
 	// propertySources table
 	t.AppendHeader(table.Row{
-		"Property Sources",
+		text.Bold.Sprint("Property Sources"),
+	})
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignRight},
+		{Number: 2, Align: text.AlignLeft},
 	})
 
 	for _, propertySources := range reader.GetField("PropertySources").Interface().([]ActuatorEnvPropertySources) {
@@ -133,7 +140,7 @@ func PrintActuatorEnv(inventory Inventory) error {
 
 				filenameParsed := strings.Split(filenameWithDocumentStr, "]") // spilt the end "] (document #3)"
 
-				applicationConfigFilename = text.WrapSoft(filenameParsed[0], 45)
+				applicationConfigFilename = filenameParsed[0]
 			}
 
 		} else {
@@ -151,9 +158,10 @@ func PrintActuatorEnv(inventory Inventory) error {
 		// append len of the properties
 		propertySourceHeaderStr = propertySourceHeaderStr + fmt.Sprintf("len: %v", len(propertySources.Properties))
 
-		t.AppendRows([]table.Row{
-			{propertySourceHeaderStr},
-		})
+		// bold the header str
+		propertySourceHeaderStr = text.Bold.Sprint(propertySourceHeaderStr)
+
+		t.AppendRow(table.Row{propertySourceHeaderStr, propertySourceHeaderStr}, rowConfigAutoMerge)
 		t.AppendSeparator()
 
 		// traverse the property map
@@ -168,6 +176,7 @@ func PrintActuatorEnv(inventory Inventory) error {
 
 				var prettyVK string
 
+				// Pretty-print based on the type
 				switch v_v.(type) {
 				case string:
 					prettyVK = fmt.Sprintf("%q", v_v)
@@ -175,13 +184,16 @@ func PrintActuatorEnv(inventory Inventory) error {
 					prettyVK = fmt.Sprintf("%v", v_v)
 				}
 
+				// Enforce word wrap
 				prettyVK = text.WrapHard(prettyVK, 80)
 
-				t.AppendRows([]table.Row{
-					{k, prettyVK},
-				})
+				t.AppendRow(table.Row{k, prettyVK}, rowConfigAutoMerge)
+
 			}
 		}
+
+		// Extra padding in the bottom of each propertySource listing... to improve read-ability
+		t.AppendRow(table.Row{""})
 
 		t.AppendSeparator()
 

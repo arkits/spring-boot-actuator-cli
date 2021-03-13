@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -89,7 +90,7 @@ func PrintActuatorEnv(inventory Inventory) error {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
-	t.SetAllowedRowLength(150)
+	t.SetAllowedRowLength(200)
 	t.AppendHeader(table.Row{
 		"Active Profiles",
 	})
@@ -116,25 +117,65 @@ func PrintActuatorEnv(inventory Inventory) error {
 			continue
 		}
 
-		// eg - server.ports
-		propertySourcesTableName := fmt.Sprintf("propertySource.Name: '%s' len: %v ", propertySources.Name, len(propertySources.Properties))
-		propertySourcesTableName = text.WrapSoft(propertySourcesTableName, 50)
+		var propertySourceType string
+		var applicationConfigFilename string
+
+		// parse out the propertySource.Name
+		if strings.HasPrefix(propertySources.Name, "applicationConfig") {
+
+			propertySourceType = "applicationConfig"
+
+			applicationConfigFilenames := strings.Split(propertySources.Name, "file:") // propertySources.Name = "applicationConfig: [file:/data/config/application.yml] (document #3)"
+
+			if len(applicationConfigFilenames) > 0 {
+
+				filenameWithDocumentStr := applicationConfigFilenames[1] // filenameWithDocumentStr="/data/config/application.yml] (document #3)"
+
+				filenameParsed := strings.Split(filenameWithDocumentStr, "]") // spilt the end "] (document #3)"
+
+				applicationConfigFilename = text.WrapSoft(filenameParsed[0], 45)
+			}
+
+		} else {
+			propertySourceType = propertySources.Name
+		}
+
+		// construct the propertySource header
+		propertySourceHeaderStr := fmt.Sprintf("sourceType: '%s' \n", propertySourceType)
+
+		// conditionally append the filename
+		if applicationConfigFilename != "" {
+			propertySourceHeaderStr = propertySourceHeaderStr + fmt.Sprintf("filename: '%s' \n", applicationConfigFilename)
+		}
+
+		// append len of the properties
+		propertySourceHeaderStr = propertySourceHeaderStr + fmt.Sprintf("len: %v", len(propertySources.Properties))
 
 		t.AppendRows([]table.Row{
-			{propertySourcesTableName},
+			{propertySourceHeaderStr},
 		})
 		t.AppendSeparator()
 
+		// traverse the property map
 		for k, v := range propertySources.Properties {
 
 			for v_k, v_v := range v.(map[string]interface{}) {
 
+				// if the map is element's key is not "value", continue
 				if v_k != "value" {
 					continue
 				}
 
-				prettyVK := fmt.Sprintf("%q", v_v)
-				prettyVK = text.WrapHard(prettyVK, 75)
+				var prettyVK string
+
+				switch v_v.(type) {
+				case string:
+					prettyVK = fmt.Sprintf("%q", v_v)
+				default:
+					prettyVK = fmt.Sprintf("%v", v_v)
+				}
+
+				prettyVK = text.WrapHard(prettyVK, 80)
 
 				t.AppendRows([]table.Row{
 					{k, prettyVK},
@@ -147,6 +188,10 @@ func PrintActuatorEnv(inventory Inventory) error {
 	}
 
 	t.Render()
+
+	t.ResetHeaders()
+	t.ResetRows()
+	t.ResetFooters()
 
 	return nil
 

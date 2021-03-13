@@ -24,8 +24,14 @@ sba-cli aims to provides a more legible output for most of the default Actuator 
 Users can still reach unsupported or custom endpoints and make use of the Inventory functionality by using the `custom` command.
 
 ```bash
-# ./sba-cli custom -E <endpoint to the custom command> -U <baseURL to your app> --skip-pretty-print
-$ ./sba-cli custom -E prometheus -U http://localhost:8080 --skip-pretty-print
+# ./sba-cli custom \
+#    -E <custom endpoint's path ID> \
+#    -U <baseURL to your app> \
+#    --skip-pretty-print
+$ ./sba-cli custom \
+    -E prometheus \
+    -U http://localhost:8080 \
+    --skip-pretty-print
 
 # HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
 # TYPE jvm_buffer_total_capacity_bytes gauge

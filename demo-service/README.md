@@ -1,18 +1,18 @@
 # Demo Service
 
-This is a basic Spring Boot application that can be used to test / demo the sba-cli.
+This is a basic Spring Boot application that can be used to test / demo sba-cli.
 
-## Getting Start
+## Getting Started
 
 Requires Java 11.
 
-## Build and Run
+## Build + Run
 
 ```bash
 ./gradlew bootRun
 ```
 
-## Build an JAR file
+## Build a fat-JAR file
 
 ```bash
 # Build the JAR file
@@ -20,4 +20,18 @@ Requires Java 11.
 
 # Execute it
 java -jar build/libs/demo-*.jar
+```
+
+## Tests
+
+```bash
+./gradlew clean test
+```
+
+## Gradle Tasks
+
+Check for available task in gradle
+
+```bash
+./gradlew tasks
 ```

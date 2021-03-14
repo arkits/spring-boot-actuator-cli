@@ -11,7 +11,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // PrettyPrintJSON prints a JSON string in a pretty format using the colorjson library
@@ -60,7 +60,7 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	t.SetStyle(table.StyleLight)
 
 	// Get window size and set and the allowed row length
-	width, height, err := terminal.GetSize(0)
+	width, height, err := term.GetSize(0)
 	if err != nil {
 		fmt.Printf(">>> Caught an error from terminal.GetSize: %s", err.Error())
 	}

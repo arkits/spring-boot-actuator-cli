@@ -3,14 +3,11 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	dynamicstruct "github.com/ompluscator/dynamic-struct"
-	"golang.org/x/term"
 )
 
 // PrettyPrintJSON prints a JSON string in a pretty format using the colorjson library
@@ -28,25 +25,15 @@ func PrettyPrintJSON(jsonStr string) {
 
 }
 
-type ActuatorEnvProperties struct {
-	ActiveProfiles  []string                     `json:"activeProfiles"`
-	PropertySources []ActuatorEnvPropertySources `json:"propertySources"`
-}
-
-type ActuatorEnvPropertySources struct {
-	Name       string                 `json:"name"`
-	Properties map[string]interface{} `json:"properties"`
-}
-
 // PrettyPrintActuatorEnvResponse pretty prints the response from /actuator/env
 func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
-	reader := makeDynamicStructReader(ActuatorEnvProperties{}, actuatorEnvResponseStr)
+	reader := MakeDynamicStructReader(ActuatorEnvProperties{}, actuatorEnvResponseStr)
 
 	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 
 	// activeProfiles table
-	t := makeTable()
+	t := MakeTable()
 
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Active Profiles"),
@@ -67,7 +54,7 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 		text.Bold.Sprint("Property Sources"),
 	})
 
-	width, _ := getTerminalSize()
+	width, _ := GetTerminalSize()
 	col1WidthMax := width / 3
 	col2WidthMax := width - col1WidthMax
 
@@ -200,17 +187,13 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	t.ResetFooters()
 }
 
-type ActuatorLinks struct {
-	Links map[string]interface{} `json:"_links"`
-}
-
 func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
 
-	reader := makeDynamicStructReader(ActuatorLinks{}, actuatorResponse)
+	reader := MakeDynamicStructReader(ActuatorLinks{}, actuatorResponse)
 
 	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 
-	t := makeTable()
+	t := MakeTable()
 
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Available Actuators"), text.Bold.Sprint("Available Actuators"),
@@ -253,61 +236,14 @@ func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
 
 }
 
-func makeTable() table.Writer {
-
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleLight)
-
-	// Get window size and set and the allowed row length
-	width, height := getTerminalSize()
-	VLog(fmt.Sprintf("width=%v height=%v", width, height))
-
-	t.SetAllowedRowLength(width)
-
-	return t
-
-}
-
-func makeDynamicStructReader(structToExtent interface{}, jsonStr string) dynamicstruct.Reader {
-
-	instance := dynamicstruct.ExtendStruct(structToExtent).
-		Build().
-		New()
-
-	err := json.Unmarshal([]byte(jsonStr), &instance)
-	if err != nil {
-		ELog(fmt.Sprintf("Error in parsing JSON response error='%s'", err.Error()))
-	}
-
-	return dynamicstruct.NewReader(instance)
-
-}
-
-func getTerminalSize() (int, int) {
-
-	// Get window size and set and the allowed row length
-	width, height, err := term.GetSize(0)
-	if err != nil {
-		fmt.Printf(">>> Caught an error from terminal.GetSize: %s", err.Error())
-	}
-
-	return width, height
-
-}
-
-type ActuatorHealthProperties struct {
-	Status string `json:"status"`
-}
-
 // PrettyPrintActuatorHealthResponse pretty prints the response from /actuator/health
 func PrettyPrintActuatorHealthResponse(actuatorResponse string) {
 
-	reader := makeDynamicStructReader(ActuatorHealthProperties{}, actuatorResponse)
+	reader := MakeDynamicStructReader(ActuatorHealthProperties{}, actuatorResponse)
 
 	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 
-	t := makeTable()
+	t := MakeTable()
 
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Health"), text.Bold.Sprint("Health"),
@@ -322,6 +258,44 @@ func PrettyPrintActuatorHealthResponse(actuatorResponse string) {
 		t.AppendRow(table.Row{
 			"status", text.FgRed.Sprint(status),
 		})
+	}
+
+	t.Render()
+
+	t.ResetHeaders()
+	t.ResetRows()
+	t.ResetFooters()
+
+}
+
+// PrettyPrintActuatorInfoResponse pretty prints the response from /actuator/info
+func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
+
+	reader := MakeDynamicStructReader(ActuatorInfoProperties{}, actuatorResponse)
+
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+
+	t := MakeTable()
+
+	t.AppendHeader(table.Row{
+		text.Bold.Sprint("Info"), text.Bold.Sprint("Info"),
+	}, rowConfigAutoMerge)
+
+	// Parse Git info
+	if reader.HasField("Git") {
+
+		gitInfo := reader.GetField("Git").Interface().(ActuatorInfoGitProperties)
+
+		t.AppendRow(table.Row{
+			text.Bold.Sprint("Git"), text.Bold.Sprint("Git"),
+		}, rowConfigAutoMerge)
+
+		t.AppendSeparator()
+
+		t.AppendRow(table.Row{
+			"branch", gitInfo.Branch,
+		}, rowConfigAutoMerge)
+
 	}
 
 	t.Render()

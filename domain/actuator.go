@@ -32,8 +32,10 @@ func PrintKnownActuator(inventory Inventory, cmdName string) error {
 		PrettyPrintActuatorLinksResponse(strResponse)
 	case "health":
 		PrettyPrintActuatorHealthResponse(strResponse)
+	case "info":
+		PrettyPrintActuatorInfoResponse(strResponse)
 	default:
-		// Haven't added custom pretty-printing support yet... just pretty as pretty JSON
+		// Haven't added custom pretty-printing support yet... just print as pretty JSON
 		PrettyPrintJSON(strResponse)
 	}
 

@@ -50,7 +50,7 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 	// Make the call
 	response, err := httpClient.Do(request)
 	if err != nil {
-		fmt.Println(err)
+		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
 		return responseBodyStr, err
 	}
 
@@ -58,7 +58,7 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err)
+		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
 		return responseBodyStr, err
 	}
 

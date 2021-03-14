@@ -9,7 +9,11 @@ import (
 func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, error) {
 
 	// Setup and validate the params
-	requestURL, _ := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
+	requestURL, err := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in GenerateRequestURL error='%s'", err.Error()))
+		return "", err
+	}
 
 	return MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
 
@@ -18,7 +22,11 @@ func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, e
 // PrintActuatorCustom retrieves data a custom /actuator endpoint and prints it based on the passed params
 func PrintActuatorCustom(inventory Inventory, endpoint string) error {
 
-	strResponse, _ := GenericGetActuatorResponse(inventory, endpoint)
+	strResponse, err := GenericGetActuatorResponse(inventory, endpoint)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		return err
+	}
 
 	if CLIConfig.SkipPrettyPrint {
 		fmt.Println(strResponse)
@@ -34,7 +42,11 @@ func PrintActuatorCustom(inventory Inventory, endpoint string) error {
 // PrintActuatorInfo retrieves data from /actuator/info and prints it out
 func PrintActuatorInfo(inventory Inventory) error {
 
-	strResponse, _ := GenericGetActuatorResponse(inventory, "info")
+	strResponse, err := GenericGetActuatorResponse(inventory, "info")
+	if err != nil {
+		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		return err
+	}
 
 	if CLIConfig.SkipPrettyPrint {
 		fmt.Println(strResponse)
@@ -50,7 +62,11 @@ func PrintActuatorInfo(inventory Inventory) error {
 // PrintActuatorEnv retrieves data from /actuator/env and prints it out
 func PrintActuatorEnv(inventory Inventory) error {
 
-	strResponse, _ := GenericGetActuatorResponse(inventory, "env")
+	strResponse, err := GenericGetActuatorResponse(inventory, "env")
+	if err != nil {
+		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		return err
+	}
 
 	if CLIConfig.SkipPrettyPrint {
 		fmt.Println(strResponse)

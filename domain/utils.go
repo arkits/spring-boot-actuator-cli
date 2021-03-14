@@ -2,13 +2,24 @@ package domain
 
 import (
 	"fmt"
+	"os"
 	"strings"
+
+	"github.com/jedib0t/go-pretty/text"
 )
 
-func VLog(text string) {
+// VLog is a utility function to pretty verbose logging statements based on the passed string and the application's config
+func VLog(log string) {
 	if CLIConfig.Verbose {
-		fmt.Printf(">>> %s \n", text)
+		fmt.Printf(">>> %s \n", log)
 	}
+}
+
+// ELog is utility function to print error logging statements
+func ELog(log string) {
+	t := text.FgRed.Sprintf(">>> ERR >>> %s", log)
+	fmt.Println(t)
+	os.Exit(1)
 }
 
 // GetStrBetween returns the trimmed string based on the input, start and end

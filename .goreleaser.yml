@@ -14,7 +14,8 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -s -w -X "main.version={{.Env.GITHUB_SHA}}"
+      - -s -w -X "main.gitCommit={{.Env.GITHUB_SHA}}"
+      - -s -w -X "main.gitTag={{.Env.GITHUB_REF}}"
 archives:
   - replacements:
       darwin: Darwin

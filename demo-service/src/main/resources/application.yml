@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: demo-service
+  profiles:
+    active: dockerized
 
 management:
   endpoints:
@@ -16,3 +18,8 @@ management:
       application: ${spring.application.name}
   info:
     git.mode: FULL
+
+---
+spring:
+  profile:
+    name: dockerized

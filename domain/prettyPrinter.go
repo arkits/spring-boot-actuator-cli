@@ -107,25 +107,50 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
 		var propertySourceType string
 		var applicationConfigFilename string
+		var isKnownPropertySourceType bool
 
-		// parse out the propertySource.Name
-		if strings.HasPrefix(propertySources.Name, "applicationConfig") {
+		if strings.HasPrefix(propertySources.Name, "server.ports") {
+
+			propertySourceType = propertySources.Name
+			isKnownPropertySourceType = true
+
+		} else if strings.HasPrefix(propertySources.Name, "systemProperties") {
+
+			propertySourceType = propertySources.Name
+			isKnownPropertySourceType = true
+
+		} else if strings.HasPrefix(propertySources.Name, "systemEnvironment") {
+
+			propertySourceType = propertySources.Name
+			isKnownPropertySourceType = true
+
+		} else if strings.HasPrefix(propertySources.Name, "applicationConfig") {
+
+			// propertySources.Name = "applicationConfig: [file:/data/config/application.yml] (document #3)"
+
+			isKnownPropertySourceType = true
 
 			propertySourceType = "applicationConfig"
 
-			applicationConfigFilenames := strings.Split(propertySources.Name, "file:") // propertySources.Name = "applicationConfig: [file:/data/config/application.yml] (document #3)"
+			applicationConfigFilename = GetStrBetween(propertySources.Name, "file:", "]")
 
-			if len(applicationConfigFilenames) > 0 {
+		} else if strings.HasPrefix(propertySources.Name, "Config resource 'class path resource [application.yml]'") {
 
-				filenameWithDocumentStr := applicationConfigFilenames[1] // filenameWithDocumentStr="/data/config/application.yml] (document #3)"
+			// propertySources.Name = "Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'"
 
-				filenameParsed := strings.Split(filenameWithDocumentStr, "]") // spilt the end "] (document #3)"
+			isKnownPropertySourceType = true
 
-				applicationConfigFilename = filenameParsed[0]
-			}
+			propertySourceType = "applicationConfig"
+
+			cpResourceFilename := GetStrBetween(propertySources.Name, "[", "]")
+
+			cpRoute := GetStrBetween(propertySources.Name, "optional:", "'")
+
+			applicationConfigFilename = cpRoute + "/" + cpResourceFilename
 
 		} else {
 			propertySourceType = propertySources.Name
+			isKnownPropertySourceType = false
 		}
 
 		// construct the propertySource header
@@ -142,7 +167,17 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 		// bold the header str
 		propertySourceHeaderStr = text.Bold.Sprint(propertySourceHeaderStr)
 
-		t.AppendRow(table.Row{propertySourceHeaderStr, propertySourceHeaderStr}, rowConfigAutoMerge)
+		if isKnownPropertySourceType {
+			t.AppendRow(table.Row{propertySourceHeaderStr, propertySourceHeaderStr}, rowConfigAutoMerge)
+		} else {
+			// if its an unknown property then we print it as-is
+			// however the text can get too long and the col widths are not equal,
+			// causes the rowConfigAutoMerge will fail...
+			// work around: just print it once on the the bigger right col
+			t.AppendRow(table.Row{"", propertySourceHeaderStr}, rowConfigAutoMerge)
+
+		}
+
 		t.AppendSeparator()
 
 		// traverse the property map

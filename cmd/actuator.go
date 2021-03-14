@@ -8,31 +8,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var actuatorCmd = &cobra.Command{
+	Use:   "actuator",
+	Short: "Interface with /actuator - Lists all the available actuator",
+	Run:   handleKnownActuatorCmd,
+}
+
 var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Interface with /actuator/info",
-	Run: func(cmd *cobra.Command, args []string) {
-
-		domain.SetupConfig(cmd)
-
-		for _, inventory := range domain.CLIConfig.Inventory {
-			domain.PrintActuatorInfo(inventory)
-		}
-
-	},
+	Run:   handleKnownActuatorCmd,
 }
 
 var envCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Interface with /actuator/env",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run:   handleKnownActuatorCmd,
+}
 
-		domain.SetupConfig(cmd)
+func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 
-		for _, inventory := range domain.CLIConfig.Inventory {
-			domain.PrintActuatorEnv(inventory)
-		}
-	},
+	domain.SetupConfig(cmd)
+
+	for _, inventory := range domain.CLIConfig.Inventory {
+		domain.PrintKnownActuator(inventory, cmd.Name())
+	}
+
 }
 
 var customCmd = &cobra.Command{

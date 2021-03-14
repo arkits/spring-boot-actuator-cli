@@ -4,18 +4,38 @@ import (
 	"fmt"
 )
 
-// GenericGetActuatorResponse retrieves data from a generic actuator endpoint and returns the response as a string
-// TODO: perform better error handling to top
-func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, error) {
+// PrintKnownActuator contains the logic to hit the right endpoint and print the data based on the passed cmdName
+func PrintKnownActuator(inventory Inventory, cmdName string) error {
 
-	// Setup and validate the params
-	requestURL, err := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
-	if err != nil {
-		ELog(fmt.Sprintf("Error in GenerateRequestURL error='%s'", err.Error()))
-		return "", err
+	var endpoint string
+	if cmdName == "actuator" {
+		endpoint = "/"
+	} else {
+		endpoint = cmdName
 	}
 
-	return MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
+	strResponse, err := GenericGetActuatorResponse(inventory, endpoint)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		return err
+	}
+
+	if CLIConfig.SkipPrettyPrint {
+		fmt.Println(strResponse)
+		return nil
+	}
+
+	switch cmdName {
+	case "env":
+		PrettyPrintActuatorEnvResponse(strResponse)
+	case "actuator":
+		PrettyPrintActuatorLinksResponse(strResponse)
+	default:
+		// Haven't added custom pretty-printing support yet... just pretty as pretty JSON
+		PrettyPrintJSON(strResponse)
+	}
+
+	return nil
 
 }
 
@@ -39,42 +59,17 @@ func PrintActuatorCustom(inventory Inventory, endpoint string) error {
 
 }
 
-// PrintActuatorInfo retrieves data from /actuator/info and prints it out
-func PrintActuatorInfo(inventory Inventory) error {
+// GenericGetActuatorResponse retrieves data from a generic actuator endpoint and returns the response as a string
+// TODO: perform better error handling to top
+func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, error) {
 
-	strResponse, err := GenericGetActuatorResponse(inventory, "info")
+	// Setup and validate the params
+	requestURL, err := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
 	if err != nil {
-		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
-		return err
+		ELog(fmt.Sprintf("Error in GenerateRequestURL error='%s'", err.Error()))
+		return "", err
 	}
 
-	if CLIConfig.SkipPrettyPrint {
-		fmt.Println(strResponse)
-		return nil
-	}
-
-	PrettyPrintJSON(strResponse)
-
-	return nil
-
-}
-
-// PrintActuatorEnv retrieves data from /actuator/env and prints it out
-func PrintActuatorEnv(inventory Inventory) error {
-
-	strResponse, err := GenericGetActuatorResponse(inventory, "env")
-	if err != nil {
-		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
-		return err
-	}
-
-	if CLIConfig.SkipPrettyPrint {
-		fmt.Println(strResponse)
-		return nil
-	}
-
-	PrettyPrintActuatorEnvResponse(strResponse)
-
-	return nil
+	return MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
 
 }

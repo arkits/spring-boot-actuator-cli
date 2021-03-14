@@ -10,7 +10,7 @@ var (
 		Short: "A CLI utility to work with Spring Boot's Actuator Endpoint",
 	}
 
-	inventoryFileName string
+	// inventoryFileName string // TODO: implement ability to pass the name/path to inventory file
 )
 
 // Execute executes the root command.
@@ -20,18 +20,20 @@ func Execute() error {
 
 func init() {
 
+	addCommonFlags(inventoryCmd)
+	addCommonFlags(actuatorCmd)
 	addCommonFlags(infoCmd)
 	addCommonFlags(envCmd)
-	addCommonFlags(inventoryCmd)
 	addCommonFlags(customCmd)
 
 	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
 
 	// Add the commands
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(inventoryCmd)
+	rootCmd.AddCommand(actuatorCmd)
 	rootCmd.AddCommand(infoCmd)
 	rootCmd.AddCommand(envCmd)
-	rootCmd.AddCommand(inventoryCmd)
 	rootCmd.AddCommand(customCmd)
 
 }

@@ -3,7 +3,6 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -41,38 +40,13 @@ type ActuatorEnvPropertySources struct {
 
 // PrettyPrintActuatorEnvResponse pretty prints the response from /actuator/env
 func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
-	instance := dynamicstruct.ExtendStruct(ActuatorEnvProperties{}).
-		Build().
-		New()
 
-	err := json.Unmarshal([]byte(actuatorEnvResponseStr), &instance)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	reader := dynamicstruct.NewReader(instance)
+	reader := makeDynamicStructReader(ActuatorEnvProperties{}, actuatorEnvResponseStr)
 
 	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 
 	// activeProfiles table
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleLight)
-
-	// Get window size and set and the allowed row length
-	width, height, err := term.GetSize(0)
-	if err != nil {
-		fmt.Printf(">>> Caught an error from terminal.GetSize: %s", err.Error())
-	}
-
-	VLog(fmt.Sprintf("width=%v height=%v", width, height))
-
-	t.SetAllowedRowLength(width)
-
-	col1WidthMax := width / 3
-	col2WidthMax := width - col1WidthMax
-
-	VLog(fmt.Sprintf("col1WidthMax=%v col2WidthMax=%v", col1WidthMax, col2WidthMax))
+	t := makeTable()
 
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Active Profiles"),
@@ -92,6 +66,10 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Property Sources"),
 	})
+
+	width, _ := getTerminalSize()
+	col1WidthMax := width / 3
+	col2WidthMax := width - col1WidthMax
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, WidthMax: col1WidthMax},
@@ -220,4 +198,100 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	t.ResetHeaders()
 	t.ResetRows()
 	t.ResetFooters()
+}
+
+type ActuatorLinks struct {
+	Links map[string]interface{} `json:"_links"`
+}
+
+func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
+
+	reader := makeDynamicStructReader(ActuatorLinks{}, actuatorResponse)
+
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+
+	t := makeTable()
+
+	t.AppendHeader(table.Row{
+		text.Bold.Sprint("Available Actuators"), text.Bold.Sprint("Available Actuators"),
+	}, rowConfigAutoMerge)
+
+	t.AppendRow(table.Row{
+		text.Bold.Sprint("href"),
+		text.Bold.Sprint("templated"),
+	})
+
+	t.AppendSeparator()
+
+	// Iterate through each element in _links
+	for _, link := range reader.GetField("Links").Interface().(map[string]interface{}) {
+
+		var href string
+		var templated string
+
+		for v_k, v_v := range link.(map[string]interface{}) {
+
+			if v_k == "href" {
+				href = fmt.Sprintf("%v", v_v)
+			}
+
+			if v_k == "templated" {
+				templated = fmt.Sprintf("%v", v_v)
+			}
+
+		}
+
+		t.AppendRow(table.Row{href, templated})
+
+	}
+
+	t.Render()
+
+	t.ResetHeaders()
+	t.ResetRows()
+	t.ResetFooters()
+
+}
+
+func makeTable() table.Writer {
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleLight)
+
+	// Get window size and set and the allowed row length
+	width, height := getTerminalSize()
+	VLog(fmt.Sprintf("width=%v height=%v", width, height))
+
+	t.SetAllowedRowLength(width)
+
+	return t
+
+}
+
+func makeDynamicStructReader(structToExtent interface{}, jsonStr string) dynamicstruct.Reader {
+
+	instance := dynamicstruct.ExtendStruct(structToExtent).
+		Build().
+		New()
+
+	err := json.Unmarshal([]byte(jsonStr), &instance)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in parsing JSON response error='%s'", err.Error()))
+	}
+
+	return dynamicstruct.NewReader(instance)
+
+}
+
+func getTerminalSize() (int, int) {
+
+	// Get window size and set and the allowed row length
+	width, height, err := term.GetSize(0)
+	if err != nil {
+		fmt.Printf(">>> Caught an error from terminal.GetSize: %s", err.Error())
+	}
+
+	return width, height
+
 }

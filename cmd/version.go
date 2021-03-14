@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var versionCmd = &cobra.Command{
@@ -13,7 +14,7 @@ var versionCmd = &cobra.Command{
 }
 
 func printCliVersion(cmd *cobra.Command, args []string) {
-	fmt.Println("spring-boot-actuator-cli v0.0.1")
+	fmt.Printf("spring-boot-actuator-cli version %s \n", viper.GetString("application.version"))
 	fmt.Println("")
 	fmt.Println("Here are some cool links: ")
 	fmt.Println("- Project Github: https://github.com/arkits/spring-boot-actuator-cli")

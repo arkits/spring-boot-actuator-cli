@@ -26,6 +26,12 @@ var envCmd = &cobra.Command{
 	Run:   handleKnownActuatorCmd,
 }
 
+var healthCmd = &cobra.Command{
+	Use:   "health",
+	Short: "Interface with /actuator/health",
+	Run:   handleKnownActuatorCmd,
+}
+
 func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 
 	domain.SetupConfig(cmd)

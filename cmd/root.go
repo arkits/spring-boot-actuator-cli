@@ -24,6 +24,7 @@ func init() {
 	addCommonFlags(actuatorCmd)
 	addCommonFlags(infoCmd)
 	addCommonFlags(envCmd)
+	addCommonFlags(healthCmd)
 	addCommonFlags(customCmd)
 
 	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
@@ -34,6 +35,7 @@ func init() {
 	rootCmd.AddCommand(actuatorCmd)
 	rootCmd.AddCommand(infoCmd)
 	rootCmd.AddCommand(envCmd)
+	rootCmd.AddCommand(healthCmd)
 	rootCmd.AddCommand(customCmd)
 
 }

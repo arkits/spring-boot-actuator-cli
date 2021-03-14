@@ -295,3 +295,39 @@ func getTerminalSize() (int, int) {
 	return width, height
 
 }
+
+type ActuatorHealthProperties struct {
+	Status string `json:"status"`
+}
+
+// PrettyPrintActuatorHealthResponse pretty prints the response from /actuator/health
+func PrettyPrintActuatorHealthResponse(actuatorResponse string) {
+
+	reader := makeDynamicStructReader(ActuatorHealthProperties{}, actuatorResponse)
+
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+
+	t := makeTable()
+
+	t.AppendHeader(table.Row{
+		text.Bold.Sprint("Health"), text.Bold.Sprint("Health"),
+	}, rowConfigAutoMerge)
+
+	status := reader.GetField("Status").String()
+	if status == "UP" {
+		t.AppendRow(table.Row{
+			"status", text.FgGreen.Sprint(status),
+		})
+	} else {
+		t.AppendRow(table.Row{
+			"status", text.FgRed.Sprint(status),
+		})
+	}
+
+	t.Render()
+
+	t.ResetHeaders()
+	t.ResetRows()
+	t.ResetFooters()
+
+}

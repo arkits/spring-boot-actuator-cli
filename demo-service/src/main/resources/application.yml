@@ -10,15 +10,25 @@ spring:
 management:
   endpoints:
     enabled-by-default: true
-    web.exposure.include: "*"
-    jmx.exposure.include: "*"
-    metrics.enabled: true
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        include: "*"
+    metrics:
+      enabled: true
+    logfile:
+      enabled: true
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: "${spring.application.name}"
   info:
     git.mode: FULL
 
+logging:
+  file:
+    name: logs/logfile.log
 ---
 spring:
   profile:

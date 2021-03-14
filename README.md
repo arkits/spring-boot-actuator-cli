@@ -2,7 +2,7 @@
 
 sba-cli is a command-line utility to work with a [Spring Boot](https://spring.io/projects/spring-boot) application's [Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html) endpoint.
 
-![env screenshot](./docs/screenshots/env.png)
+![actuator screenshot](./docs/screenshots/actuator.png)
 
 ## Usage
 

@@ -158,7 +158,7 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
 		// conditionally append the filename
 		if applicationConfigFilename != "" {
-			propertySourceHeaderStr = propertySourceHeaderStr + fmt.Sprintf("filename: '%s' \n", applicationConfigFilename)
+			propertySourceHeaderStr = propertySourceHeaderStr + text.WrapHard(fmt.Sprintf("filename: '%s'", applicationConfigFilename), col1WidthMax) + "\n"
 		}
 
 		// append len of the properties

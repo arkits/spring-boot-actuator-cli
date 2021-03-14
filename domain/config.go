@@ -88,9 +88,7 @@ func SetupConfig(cmd *cobra.Command) {
 	// Assume that if url was passed, then it is an impromptu definition
 	if LookupFlagInCmd("url", cmd) {
 
-		if CLIConfig.Verbose {
-			fmt.Println(">>> url was set... assuming impromptu definition")
-		}
+		VLog("url was set... assuming impromptu definition")
 
 		var impromptuInventory Inventory
 		impromptuInventory.Name = "unset"

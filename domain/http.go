@@ -44,10 +44,8 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 	}
 
 	// Explicitly print out the outgoing HTTP call
-	if CLIConfig.Verbose {
-		fmt.Printf(">>> %s %s \n", request.Method, request.URL)
-		fmt.Printf(">>> Authorization: %s \n", authorizationHeader)
-	}
+	VLog(fmt.Sprintf("%s %s", request.Method, request.URL))
+	VLog(fmt.Sprintf("Authorization: %s", authorizationHeader))
 
 	// Make the call
 	response, err := httpClient.Do(request)
@@ -66,9 +64,7 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 
 	responseBodyStr = string(responseBody)
 
-	if CLIConfig.Verbose {
-		fmt.Printf(">>> Proto: %s Status: %s \n", response.Proto, response.Status)
-	}
+	VLog(fmt.Sprintf("Proto: %s Status: %s", response.Proto, response.Status))
 
 	return responseBodyStr, nil
 

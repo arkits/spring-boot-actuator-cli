@@ -11,6 +11,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // PrettyPrintJSON prints a JSON string in a pretty format using the colorjson library
@@ -57,7 +58,22 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
-	t.SetAllowedRowLength(200)
+
+	// Get window size and set and the allowed row length
+	width, height, err := terminal.GetSize(0)
+	if err != nil {
+		fmt.Printf(">>> Caught an error from terminal.GetSize: %s", err.Error())
+	}
+
+	VLog(fmt.Sprintf("width=%v height=%v", width, height))
+
+	t.SetAllowedRowLength(width)
+
+	col1WidthMax := width / 3
+	col2WidthMax := width - col1WidthMax
+
+	VLog(fmt.Sprintf("col1WidthMax=%v col2WidthMax=%v", col1WidthMax, col2WidthMax))
+
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Active Profiles"),
 	})
@@ -78,8 +94,8 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 1, Align: text.AlignRight},
-		{Number: 2, Align: text.AlignLeft},
+		{Number: 1, Align: text.AlignRight, WidthMax: col1WidthMax},
+		{Number: 2, Align: text.AlignLeft, WidthMax: col2WidthMax},
 	})
 
 	for _, propertySources := range reader.GetField("PropertySources").Interface().([]ActuatorEnvPropertySources) {

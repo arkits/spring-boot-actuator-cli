@@ -13,6 +13,12 @@ import (
 // PrettyPrintJSON prints a JSON string in a pretty format using the colorjson library
 func PrettyPrintJSON(jsonStr string) {
 
+	fmt.Println(PrettyJSON(jsonStr))
+
+}
+
+func PrettyJSON(jsonStr string) string {
+
 	colorJsonFormatter := colorjson.NewFormatter()
 	colorJsonFormatter.Indent = 2
 
@@ -21,7 +27,8 @@ func PrettyPrintJSON(jsonStr string) {
 	json.Unmarshal([]byte(jsonStr), &obj)
 
 	s, _ := colorJsonFormatter.Marshal(obj)
-	fmt.Println(string(s))
+
+	return string(s)
 
 }
 
@@ -277,17 +284,13 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 
 	t := MakeTable()
 
-	t.AppendHeader(table.Row{
-		text.Bold.Sprint("Info"), text.Bold.Sprint("Info"),
-	}, rowConfigAutoMerge)
-
 	// Parse Git info
 	if reader.HasField("Git") {
 
 		gitInfo := reader.GetField("Git").Interface().(ActuatorInfoGitProperties)
 
-		t.AppendRow(table.Row{
-			text.Bold.Sprint("Git"), text.Bold.Sprint("Git"),
+		t.AppendHeader(table.Row{
+			text.Bold.Sprint("Git Info"), text.Bold.Sprint("Git Info"),
 		}, rowConfigAutoMerge)
 
 		t.AppendSeparator()
@@ -296,7 +299,65 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 			"branch", gitInfo.Branch,
 		}, rowConfigAutoMerge)
 
+		// Parse commit related info in response.git.commit
+		for k, v := range gitInfo.Commit {
+			if k == "id" {
+				switch v.(type) {
+				case string:
+					// Target's info.git.mode config was set to DEFAULT
+					// Sample -
+					// "commit": {
+					// 	"id": "01dbf9f",
+					// 	"time": "2021-03-14 23:30:28+0000"
+					// }
+					t.AppendRow(table.Row{
+						"commit.ID", fmt.Sprintf("%s", v),
+					}, rowConfigAutoMerge)
+
+				default:
+					// Target's info.git.mode config was set to FULL
+					// Sample -
+					// "commit": {
+					// 	"time": "2021-03-14 23:30:28+0000",
+					// 	"message": {
+					// 		"full": "dev: wip pretty-printing git info\n",
+					// 		"short": "dev: wip pretty-printing git info"
+					// 	},
+					// 	"id": {
+					// 		"describe": "0.0.2-5-g01dbf9f-dirty",
+					// 		"abbrev": "01dbf9f",
+					// 		"full": "01dbf9f76c23701dbccf44cd4b8e44abd6ec8640"
+					// 	},
+					// 	"user": {
+					// 		"email": "arkits@outlook.com",
+					// 		"name": "Archit Khode"
+					// 	}
+					// },
+					for v_k, v_v := range v.(map[string]interface{}) {
+						t.AppendRow(table.Row{
+							fmt.Sprintf("commit.%v", v_k), fmt.Sprintf("%v", v_v),
+						}, rowConfigAutoMerge)
+					}
+
+				}
+			}
+		}
+
 	}
+
+	t.Render()
+
+	t.ResetHeaders()
+	t.ResetRows()
+	t.ResetFooters()
+
+	t.AppendHeader(table.Row{
+		text.Bold.Sprint("Raw /actuator/info Response"),
+	}, rowConfigAutoMerge)
+
+	t.AppendRow(table.Row{
+		PrettyJSON(actuatorResponse),
+	}, rowConfigAutoMerge)
 
 	t.Render()
 

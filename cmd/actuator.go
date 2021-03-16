@@ -32,12 +32,18 @@ var healthCmd = &cobra.Command{
 	Run:   handleKnownActuatorCmd,
 }
 
+var logfileCmd = &cobra.Command{
+	Use:   "logfile",
+	Short: "Interface with /actuator/logfile",
+	Run:   handleActuatorLogfileCmd,
+}
+
 func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 
 	domain.SetupConfig(cmd)
 
 	for _, inventory := range domain.CLIConfig.Inventory {
-		domain.PrintKnownActuator(inventory, cmd.Name())
+		domain.GetAndPrintKnownActuator(inventory, cmd.Name())
 	}
 
 }
@@ -59,7 +65,18 @@ var customCmd = &cobra.Command{
 		endpoint := cmd.Flags().Lookup("endpoint").Value.String()
 
 		for _, inventory := range domain.CLIConfig.Inventory {
-			domain.PrintActuatorCustom(inventory, endpoint)
+			domain.GetAndPrintActuatorCustom(inventory, endpoint)
 		}
 	},
+}
+
+func handleActuatorLogfileCmd(cmd *cobra.Command, args []string) {
+
+	domain.SetupConfig(cmd)
+
+	// currently only support tailing 1 Inventory
+	inventory := domain.CLIConfig.Inventory[0]
+
+	domain.GetAndPrintActuatorLogs(inventory)
+
 }

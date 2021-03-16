@@ -13,6 +13,7 @@ type Config struct {
 	Verbose                bool
 	ActuatorEndpointPrefix string
 	SkipPrettyPrint        bool
+	Tail                   bool
 	Inventory              []Inventory
 }
 
@@ -37,6 +38,12 @@ func SetupConfig(cmd *cobra.Command) {
 		viper.BindPFlag("ActuatorEndpointPrefix", cmd.Flags().Lookup("actuator-base"))
 	} else {
 		viper.SetDefault("ActuatorEndpointPrefix", "actuator")
+	}
+
+	if LookupFlagInCmd("tail", cmd) {
+		viper.BindPFlag("Tail", cmd.Flags().Lookup("tail"))
+	} else {
+		viper.SetDefault("Tail", false)
 	}
 
 	viper.SetConfigType("yaml")
@@ -115,11 +122,16 @@ func SetupConfig(cmd *cobra.Command) {
 func LookupFlagInCmd(flagName string, cmd *cobra.Command) bool {
 
 	// I'm not sure about this...
-	value := cmd.Flags().Lookup(flagName).Value.String()
+	exists := cmd.Flags().Lookup(flagName)
+	if exists == nil {
+		return false
+	}
 
+	value := cmd.Flags().Lookup(flagName).Value.String()
 	if value == "" {
 		return false
 	}
+
 	return true
 }
 

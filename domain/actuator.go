@@ -2,10 +2,11 @@ package domain
 
 import (
 	"fmt"
+	"time"
 )
 
-// PrintKnownActuator contains the logic to hit the right endpoint and print the data based on the passed cmdName
-func PrintKnownActuator(inventory Inventory, cmdName string) error {
+// GetAndPrintKnownActuator contains the logic to hit the right endpoint and print the data based on the passed cmdName
+func GetAndPrintKnownActuator(inventory Inventory, cmdName string) error {
 
 	var endpoint string
 	if cmdName == "actuator" {
@@ -14,9 +15,9 @@ func PrintKnownActuator(inventory Inventory, cmdName string) error {
 		endpoint = cmdName
 	}
 
-	strResponse, err := GenericGetActuatorResponse(inventory, endpoint)
+	strResponse, err := GetGenericActuatorResponse(inventory, endpoint)
 	if err != nil {
-		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		ELog(fmt.Sprintf("Error in GetGenericActuatorResponse error='%s'", err.Error()))
 		return err
 	}
 
@@ -43,12 +44,12 @@ func PrintKnownActuator(inventory Inventory, cmdName string) error {
 
 }
 
-// PrintActuatorCustom retrieves data a custom /actuator endpoint and prints it based on the passed params
-func PrintActuatorCustom(inventory Inventory, endpoint string) error {
+// GetAndPrintActuatorCustom retrieves data a custom /actuator endpoint and prints it based on the passed params
+func GetAndPrintActuatorCustom(inventory Inventory, endpoint string) error {
 
-	strResponse, err := GenericGetActuatorResponse(inventory, endpoint)
+	strResponse, err := GetGenericActuatorResponse(inventory, endpoint)
 	if err != nil {
-		ELog(fmt.Sprintf("Error in GenericGetActuatorResponse error='%s'", err.Error()))
+		ELog(fmt.Sprintf("Error in GetGenericActuatorResponse error='%s'", err.Error()))
 		return err
 	}
 
@@ -63,9 +64,9 @@ func PrintActuatorCustom(inventory Inventory, endpoint string) error {
 
 }
 
-// GenericGetActuatorResponse retrieves data from a generic actuator endpoint and returns the response as a string
+// GetGenericActuatorResponse retrieves data from a generic actuator endpoint and returns the response as a string
 // TODO: perform better error handling to top
-func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, error) {
+func GetGenericActuatorResponse(inventory Inventory, endpoint string) (string, error) {
 
 	// Setup and validate the params
 	requestURL, err := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+endpoint)
@@ -74,6 +75,68 @@ func GenericGetActuatorResponse(inventory Inventory, endpoint string) (string, e
 		return "", err
 	}
 
-	return MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, inventory.SkipVerifySSL)
+	response, err := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, "", inventory.SkipVerifySSL)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
+	}
+
+	defer response.Body.Close()
+
+	VLog(fmt.Sprintf("[response] Proto: %s Status: %s", response.Proto, response.Status))
+
+	responseBodyStr, err := ResponseBodyToStr(response)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in ResponseBodyToStr error='%s'", err.Error()))
+	}
+
+	if response.StatusCode != 200 {
+		err := fmt.Errorf("HTTP response from target was not 2XX - response.StatusCode=%v responseBodyStr=%v", response.StatusCode, responseBodyStr)
+		ELog(fmt.Sprint(err))
+	}
+
+	return responseBodyStr, nil
+
+}
+
+func GetAndPrintActuatorLogs(inventory Inventory) {
+
+	contentLength := 0
+
+	for CLIConfig.Tail {
+
+		rangeHeader := fmt.Sprintf("bytes=%v-", contentLength)
+
+		// Setup and validate the params
+		requestURL, err := GenerateRequestURL(inventory.BaseURL, "/"+CLIConfig.ActuatorEndpointPrefix+"/"+"logfile")
+		if err != nil {
+			ELog(fmt.Sprintf("Error in GenerateRequestURL error='%s'", err.Error()))
+		}
+
+		response, err := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, rangeHeader, inventory.SkipVerifySSL)
+		if err != nil {
+			ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
+		}
+
+		defer response.Body.Close()
+
+		VLog(fmt.Sprintf("[response] Proto: %s Status: %s", response.Proto, response.Status))
+
+		if response.StatusCode == 206 {
+
+			responseBodyStr, err := ResponseBodyToStr(response)
+			if err != nil {
+				ELog(fmt.Sprintf("Error in ResponseBodyToStr error='%s'", err.Error()))
+			}
+
+			contentLength = contentLength + len(responseBodyStr)
+			VLog(fmt.Sprintf("contentLength=%v", contentLength))
+
+			fmt.Print(responseBodyStr)
+
+		}
+
+		time.Sleep(1 * time.Second)
+
+	}
 
 }

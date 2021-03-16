@@ -15,64 +15,44 @@ var httpClient = &http.Client{
 }
 
 // MakeHTTPCall is a wrapper function to aid performing an HTTP call
-func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader string, skipVerifySSL bool) (string, error) {
+func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader string, rangeHeader string, skipVerifySSL bool) (*http.Response, error) {
 
-	var responseBodyStr string
+	var response *http.Response
 
 	// Construct the request
 	request, err := http.NewRequest(requestMethod, requestURL, nil)
 	if err != nil {
 		fmt.Println(err)
-		return responseBodyStr, err
+		return response, err
 	}
+
+	VLog(fmt.Sprintf("[request] %s %s", request.Method, request.URL))
 
 	// Set the Headers
 	request.Header.Set("Content-Type", "application/json; charset=utf-8")
 	request.Header.Set("User-Agent", "sba-cli/1.0")
 
 	if authorizationHeader != "" {
-		request.Header.Add("Authorization", authorizationHeader)
+		request.Header.Set("Authorization", authorizationHeader)
+		VLog(fmt.Sprintf("[request] Authorization: %s", authorizationHeader))
+	}
+
+	if rangeHeader != "" {
+		request.Header.Set("Range", rangeHeader)
+		VLog(fmt.Sprintf("[request] Range: %s", rangeHeader))
 	}
 
 	// Handle skipping SSL verification
 	if skipVerifySSL {
-		fmt.Println(">>> Skipping SSL Verification")
+		VLog(">>> Skipping SSL Verification")
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 		httpClient.Transport = tr
 	}
 
-	// Explicitly print out the outgoing HTTP call
-	VLog(fmt.Sprintf("%s %s", request.Method, request.URL))
-	VLog(fmt.Sprintf("Authorization: %s", authorizationHeader))
-
 	// Make the call
-	response, err := httpClient.Do(request)
-	if err != nil {
-		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
-		return responseBodyStr, err
-	}
-
-	defer response.Body.Close()
-
-	if response.StatusCode != 200 {
-		err := fmt.Errorf("HTTP response from target was not 2XX - response.StatusCode=%v", response.StatusCode)
-		ELog(fmt.Sprint(err))
-		return responseBodyStr, err
-	}
-
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
-		return responseBodyStr, err
-	}
-
-	responseBodyStr = string(responseBody)
-
-	VLog(fmt.Sprintf("Proto: %s Status: %s", response.Proto, response.Status))
-
-	return responseBodyStr, nil
+	return httpClient.Do(request)
 
 }
 
@@ -91,5 +71,21 @@ func GenerateRequestURL(baseURL string, pathToAppend string) (string, error) {
 	generatedRequestURL = u.String()
 
 	return generatedRequestURL, nil
+
+}
+
+func ResponseBodyToStr(response *http.Response) (string, error) {
+
+	var responseBodyStr string
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		ELog(fmt.Sprintf("Error in ResponseBodyToStr error='%s'", err.Error()))
+		return responseBodyStr, err
+	}
+
+	responseBodyStr = string(responseBody)
+
+	return responseBodyStr, nil
 
 }

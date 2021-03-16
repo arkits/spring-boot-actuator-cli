@@ -26,8 +26,11 @@ func init() {
 	addCommonFlags(envCmd)
 	addCommonFlags(healthCmd)
 	addCommonFlags(customCmd)
+	addCommonFlags(logfileCmd)
 
 	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
+
+	logfileCmd.Flags().BoolP("tail", "f", false, "Tail the logfile")
 
 	// Add the commands
 	rootCmd.AddCommand(versionCmd)
@@ -37,6 +40,7 @@ func init() {
 	rootCmd.AddCommand(envCmd)
 	rootCmd.AddCommand(healthCmd)
 	rootCmd.AddCommand(customCmd)
+	rootCmd.AddCommand(logfileCmd)
 
 }
 

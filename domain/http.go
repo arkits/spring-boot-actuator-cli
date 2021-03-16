@@ -56,6 +56,12 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 
 	defer response.Body.Close()
 
+	if response.StatusCode != 200 {
+		err := fmt.Errorf("HTTP response from target was not 2XX - response.StatusCode=%v", response.StatusCode)
+		ELog(fmt.Sprint(err))
+		return responseBodyStr, err
+	}
+
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))

@@ -4,9 +4,19 @@ This is a basic Spring Boot application that can be used to test / demo sba-cli.
 
 ## Getting Started
 
-Requires Java 11.
+`demo-service` supports Docker multi-stage builds - This allows you to build and run the demo-service without having to setup JDK / Java on your machine.
+
+```bash
+# Build the service + image
+$ docker-compose build demo
+
+# Run the image
+$ docker-compose up demo
+```
 
 ## Build + Run
+
+Requires Java 11.
 
 ```bash
 ./gradlew bootRun

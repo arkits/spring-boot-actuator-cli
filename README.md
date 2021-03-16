@@ -46,7 +46,7 @@ jvm_buffer_total_capacity_bytes{application="user-service",id="direct",} 81920.0
 
 ### Inventory
 
-Chances are that you are managing multiple micro-services. sba-cli is designed to support this is use case by allowing the user to supply an Inventory. An Inventory can be defined in a `config.yaml` that must be placed in the same directory as sba-cli. Refer to the [config.sample.yaml](./config.sample.yaml)
+Chances are that you are managing multiple micro-services. sba-cli is designed to support this is use case by allowing the user to supply an Inventory. An Inventory can be defined in a `config.yaml` that must be placed in the same directory as sba-cli. Refer to the [config.sample.yml](./config.sample.yml)
 
 After defining multiple services in your `config.yaml`, you can refer to a specific service by passing it's name in `-S` flag.
 

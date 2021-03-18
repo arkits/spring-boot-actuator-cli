@@ -23,7 +23,7 @@ $ ./sba-cli info -U http://localhost:8080
 }
 ```
 
-sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently supported endpoints are - `actuator`,`info`, `env`, `health`.
+sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently supported endpoints are - `actuator`,`info`, `env`, `health`, `logfile`.
 
 Users can still reach unsupported or custom endpoints and make use of the Inventory functionality by using the `custom` command.
 

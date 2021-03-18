@@ -102,7 +102,7 @@ func GetAndPrintActuatorLogs(inventory Inventory) {
 
 	contentLength := 0
 
-	for CLIConfig.Tail {
+	for {
 
 		rangeHeader := fmt.Sprintf("bytes=%v-", contentLength)
 
@@ -135,7 +135,13 @@ func GetAndPrintActuatorLogs(inventory Inventory) {
 
 		}
 
-		time.Sleep(1 * time.Second)
+		// Run once and exit out
+		if !CLIConfig.Tail {
+			break
+		} else {
+			response.Body.Close()
+			time.Sleep(1 * time.Second)
+		}
 
 	}
 

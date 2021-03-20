@@ -4,6 +4,10 @@
 
 ![actuator.png](./actuator.png)
 
+## `info`
+
+![info.png](./info.png)
+
 ## `health`
 
 ![health.png](./health.png)

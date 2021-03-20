@@ -57,7 +57,7 @@ func MakeTable() table.Writer {
 
 	// Get window size and set and the allowed row length
 	width, height := GetTerminalSize()
-	VLog(fmt.Sprintf("width=%v height=%v", width, height))
+	VLog(fmt.Sprintf("[term] width=%v height=%v", width, height))
 
 	t.SetAllowedRowLength(width)
 

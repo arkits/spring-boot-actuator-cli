@@ -50,11 +50,8 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 			{profileName},
 		})
 	}
-	t.Render()
 
-	t.ResetHeaders()
-	t.ResetRows()
-	t.ResetFooters()
+	renderAndResetTable(t)
 
 	// propertySources table
 	t.AppendHeader(table.Row{
@@ -143,9 +140,9 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 			t.AppendRow(table.Row{propertySourceHeaderStr, propertySourceHeaderStr}, rowConfigAutoMerge)
 		} else {
 			// if its an unknown property then we print it as-is
-			// however the text can get too long and the col widths are not equal,
-			// causes the rowConfigAutoMerge will fail...
-			// work around: just print it once on the the bigger right col
+			// however the text can get too long and the col widths would not be equal,
+			// but equal col widths are required for rowConfigAutoMerge..
+			// work around: just print it once in the bigger col on the right
 			t.AppendRow(table.Row{"", propertySourceHeaderStr}, rowConfigAutoMerge)
 
 		}
@@ -187,11 +184,8 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
 	}
 
-	t.Render()
+	renderAndResetTable(t)
 
-	t.ResetHeaders()
-	t.ResetRows()
-	t.ResetFooters()
 }
 
 func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
@@ -235,11 +229,7 @@ func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
 
 	}
 
-	t.Render()
-
-	t.ResetHeaders()
-	t.ResetRows()
-	t.ResetFooters()
+	renderAndResetTable(t)
 
 }
 
@@ -289,67 +279,70 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 
 		gitInfo := reader.GetField("Git").Interface().(ActuatorInfoGitProperties)
 
-		t.AppendHeader(table.Row{
-			text.Bold.Sprint("Git Info"), text.Bold.Sprint("Git Info"),
-		}, rowConfigAutoMerge)
+		if gitInfo.Branch == "" {
 
-		t.AppendSeparator()
+			VLog("[pp] gitInfo.Branch was empty... Skipping parsing of GitInfo")
 
-		t.AppendRow(table.Row{
-			"branch", gitInfo.Branch,
-		}, rowConfigAutoMerge)
+		} else {
+			t.AppendHeader(table.Row{
+				text.Bold.Sprint("Git Info"), text.Bold.Sprint("Git Info"),
+			}, rowConfigAutoMerge)
 
-		// Parse commit related info in response.git.commit
-		for k, v := range gitInfo.Commit {
-			if k == "id" {
-				switch v.(type) {
-				case string:
-					// Target's info.git.mode config was set to DEFAULT
-					// Sample -
-					// "commit": {
-					// 	"id": "01dbf9f",
-					// 	"time": "2021-03-14 23:30:28+0000"
-					// }
-					t.AppendRow(table.Row{
-						"commit.ID", fmt.Sprintf("%s", v),
-					}, rowConfigAutoMerge)
+			t.AppendSeparator()
 
-				default:
-					// Target's info.git.mode config was set to FULL
-					// Sample -
-					// "commit": {
-					// 	"time": "2021-03-14 23:30:28+0000",
-					// 	"message": {
-					// 		"full": "dev: wip pretty-printing git info\n",
-					// 		"short": "dev: wip pretty-printing git info"
-					// 	},
-					// 	"id": {
-					// 		"describe": "0.0.2-5-g01dbf9f-dirty",
-					// 		"abbrev": "01dbf9f",
-					// 		"full": "01dbf9f76c23701dbccf44cd4b8e44abd6ec8640"
-					// 	},
-					// 	"user": {
-					// 		"email": "arkits@outlook.com",
-					// 		"name": "Archit Khode"
-					// 	}
-					// },
-					for v_k, v_v := range v.(map[string]interface{}) {
+			t.AppendRow(table.Row{
+				"branch", gitInfo.Branch,
+			}, rowConfigAutoMerge)
+
+			// Parse commit related info in response.git.commit
+			for k, v := range gitInfo.Commit {
+				if k == "id" {
+					switch v.(type) {
+					case string:
+						// Target's info.git.mode config was set to DEFAULT
+						// Sample -
+						// "commit": {
+						// 	"id": "01dbf9f",
+						// 	"time": "2021-03-14 23:30:28+0000"
+						// }
 						t.AppendRow(table.Row{
-							fmt.Sprintf("commit.%v", v_k), fmt.Sprintf("%v", v_v),
+							"commit.ID", fmt.Sprintf("%s", v),
 						}, rowConfigAutoMerge)
-					}
 
+					default:
+						// Target's info.git.mode config was set to FULL
+						// Sample -
+						// "commit": {
+						// 	"time": "2021-03-14 23:30:28+0000",
+						// 	"message": {
+						// 		"full": "dev: wip pretty-printing git info\n",
+						// 		"short": "dev: wip pretty-printing git info"
+						// 	},
+						// 	"id": {
+						// 		"describe": "0.0.2-5-g01dbf9f-dirty",
+						// 		"abbrev": "01dbf9f",
+						// 		"full": "01dbf9f76c23701dbccf44cd4b8e44abd6ec8640"
+						// 	},
+						// 	"user": {
+						// 		"email": "arkits@outlook.com",
+						// 		"name": "Archit Khode"
+						// 	}
+						// },
+						for v_k, v_v := range v.(map[string]interface{}) {
+							t.AppendRow(table.Row{
+								fmt.Sprintf("commit.%v", v_k), fmt.Sprintf("%v", v_v),
+							}, rowConfigAutoMerge)
+						}
+
+					}
 				}
 			}
+
+			renderAndResetTable(t)
+
 		}
 
 	}
-
-	t.Render()
-
-	t.ResetHeaders()
-	t.ResetRows()
-	t.ResetFooters()
 
 	t.AppendHeader(table.Row{
 		text.Bold.Sprint("Raw /actuator/info Response"),
@@ -358,6 +351,12 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 	t.AppendRow(table.Row{
 		PrettyJSON(actuatorResponse),
 	}, rowConfigAutoMerge)
+
+	renderAndResetTable(t)
+
+}
+
+func renderAndResetTable(t table.Writer) {
 
 	t.Render()
 

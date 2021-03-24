@@ -282,6 +282,31 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 
 	t := MakeTable()
 
+	// Parse Service Info
+	if reader.HasField("Title") {
+
+		title := reader.GetField("Title").String()
+
+		if title == "" {
+
+			VLog("[pp] Title was empty... Skipping parsing of Title")
+
+		} else {
+			t.AppendHeader(table.Row{
+				text.Bold.Sprint("Service Info"), text.Bold.Sprint("Service Info"),
+			}, rowConfigAutoMerge)
+
+			t.AppendSeparator()
+
+			t.AppendRow(table.Row{
+				"title", title,
+			}, rowConfigAutoMerge)
+
+			renderAndResetTable(t)
+
+		}
+	}
+
 	// Parse Git info
 	if reader.HasField("Git") {
 
@@ -344,12 +369,20 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 
 					}
 				}
+
+				if k == "time" {
+					switch v.(type) {
+					case string:
+						t.AppendRow(table.Row{
+							"commit.time", fmt.Sprintf("%s", v),
+						}, rowConfigAutoMerge)
+					}
+				}
 			}
 
 			renderAndResetTable(t)
 
 		}
-
 	}
 
 	t.AppendHeader(table.Row{

@@ -19,7 +19,8 @@ type ActuatorHealthProperties struct {
 }
 
 type ActuatorInfoProperties struct {
-	Git ActuatorInfoGitProperties `json:"git"`
+	Git   ActuatorInfoGitProperties `json:"git"`
+	Title string                    `json:"title"`
 }
 
 type ActuatorInfoGitProperties struct {

@@ -13,6 +13,12 @@ import (
 // PrintInventoryHeader is a util function that prints a pretty Header text
 // This is intended to be run for each Inventory - Prior execution of the domain specific function
 func PrintInventoryHeader(inventory Inventory) {
+
+	// improptu Inventory definition... no need to print the header
+	if inventory.Name == "unset" {
+		return
+	}
+
 	fmt.Printf(">>> %v \n", inventory.Name)
 }
 

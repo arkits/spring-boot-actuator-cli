@@ -20,6 +20,7 @@ func Execute() error {
 
 func init() {
 
+	// Add commonly used flags
 	addCommonFlags(inventoryCmd)
 	addCommonFlags(actuatorCmd)
 	addCommonFlags(infoCmd)
@@ -27,12 +28,13 @@ func init() {
 	addCommonFlags(healthCmd)
 	addCommonFlags(customCmd)
 	addCommonFlags(logfileCmd)
+	addCommonFlags(prometheusCmd)
 
+	// Custom Flags
 	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
-
 	logfileCmd.Flags().BoolP("tail", "f", false, "Tail the logfile")
 
-	// Add the commands
+	// Add the Commands to the rootCmd
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(inventoryCmd)
 	rootCmd.AddCommand(actuatorCmd)
@@ -41,6 +43,7 @@ func init() {
 	rootCmd.AddCommand(healthCmd)
 	rootCmd.AddCommand(customCmd)
 	rootCmd.AddCommand(logfileCmd)
+	rootCmd.AddCommand(prometheusCmd)
 
 }
 

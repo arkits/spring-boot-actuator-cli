@@ -38,6 +38,12 @@ var logfileCmd = &cobra.Command{
 	Run:   handleActuatorLogfileCmd,
 }
 
+var prometheusCmd = &cobra.Command{
+	Use:   "prometheus",
+	Short: "Interface with /actuator/prometheus",
+	Run:   handleKnownActuatorCmd,
+}
+
 func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 
 	domain.SetupConfig(cmd)

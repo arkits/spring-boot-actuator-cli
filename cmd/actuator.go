@@ -67,7 +67,9 @@ var customCmd = &cobra.Command{
 		endpoint := cmd.Flags().Lookup("endpoint").Value.String()
 
 		for _, inventory := range domain.CLIConfig.Inventory {
+			domain.PrintInventoryHeader(inventory)
 			domain.GetAndPrintActuatorCustom(inventory, endpoint)
+			domain.PrintInventoryFooter(inventory)
 		}
 	},
 }

@@ -21,9 +21,8 @@ func VLog(log string) {
 
 // ELog is utility function to print error logging statements
 func ELog(log string) {
-	t := text.FgRed.Sprintf(">>> ERR >>> %s", log)
+	t := text.FgRed.Sprintf(">>> [ERR] %s", log)
 	fmt.Println(t)
-	os.Exit(1)
 }
 
 // GetStrBetween returns the trimmed string based on the input, start and end

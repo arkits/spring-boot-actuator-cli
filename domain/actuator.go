@@ -17,7 +17,6 @@ func GetAndPrintKnownActuator(inventory Inventory, cmdName string) error {
 
 	strResponse, err := GetGenericActuatorResponse(inventory, endpoint)
 	if err != nil {
-		ELog(fmt.Sprintf("Error in GetGenericActuatorResponse error='%s'", err.Error()))
 		return err
 	}
 
@@ -49,7 +48,6 @@ func GetAndPrintActuatorCustom(inventory Inventory, endpoint string) error {
 
 	strResponse, err := GetGenericActuatorResponse(inventory, endpoint)
 	if err != nil {
-		ELog(fmt.Sprintf("Error in GetGenericActuatorResponse error='%s'", err.Error()))
 		return err
 	}
 
@@ -78,6 +76,7 @@ func GetGenericActuatorResponse(inventory Inventory, endpoint string) (string, e
 	response, err := MakeHTTPCall("GET", requestURL, inventory.AuthorizationHeader, "", inventory.SkipVerifySSL)
 	if err != nil {
 		ELog(fmt.Sprintf("Error in MakeHTTPCall error='%s'", err.Error()))
+		return "", err
 	}
 
 	defer response.Body.Close()
@@ -87,11 +86,13 @@ func GetGenericActuatorResponse(inventory Inventory, endpoint string) (string, e
 	responseBodyStr, err := ResponseBodyToStr(response)
 	if err != nil {
 		ELog(fmt.Sprintf("Error in ResponseBodyToStr error='%s'", err.Error()))
+		return "", err
 	}
 
 	if response.StatusCode != 200 {
 		err := fmt.Errorf("HTTP response from target was not 2XX - response.StatusCode=%v responseBodyStr=%v", response.StatusCode, responseBodyStr)
 		ELog(fmt.Sprint(err))
+		return "", err
 	}
 
 	return responseBodyStr, nil

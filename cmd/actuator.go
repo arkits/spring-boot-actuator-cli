@@ -44,6 +44,12 @@ var prometheusCmd = &cobra.Command{
 	Run:   handleKnownActuatorCmd,
 }
 
+var metricsCmd = &cobra.Command{
+	Use:   "metrics",
+	Short: "Interface with /actuator/metrics",
+	Run:   handleKnownActuatorCmd,
+}
+
 func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 
 	domain.SetupConfig(cmd)

@@ -10,10 +10,14 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
+// PrintInventoryHeader is a util function that prints a pretty Header text
+// This is intended to be run for each Inventory - Prior execution of the domain specific function
 func PrintInventoryHeader(inventory Inventory) {
 	fmt.Printf(">>> %v \n", inventory.Name)
 }
 
+// PrintInventoryFooter is a util function that prints a pretty Header text
+// This is intended to be run for each Inventory - Post execution of the domain specific function
 func PrintInventoryFooter(inventory Inventory) {
 	fmt.Print("\n")
 }
@@ -196,6 +200,7 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
 }
 
+// PrettyPrintActuatorLinksResponse pretty prints the response from /actuator
 func PrettyPrintActuatorLinksResponse(actuatorResponse string) {
 
 	reader := MakeDynamicStructReader(ActuatorLinks{}, actuatorResponse)
@@ -401,6 +406,7 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 
 }
 
+// renderAndResetTable is a util function that will render and reset the table - a commonly used set of functions
 func renderAndResetTable(t table.Writer) {
 
 	t.Render()
@@ -408,5 +414,34 @@ func renderAndResetTable(t table.Writer) {
 	t.ResetHeaders()
 	t.ResetRows()
 	t.ResetFooters()
+
+}
+
+// PrettyPrintActuatorMetricsResponse pretty prints the response from /actuator/metrics
+func PrettyPrintActuatorMetricsResponse(actuatorResponse string) {
+
+	reader := MakeDynamicStructReader(ActuatorMetricsProperties{}, actuatorResponse)
+
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+
+	t := MakeTable()
+
+	t.AppendHeader(table.Row{
+		text.Bold.Sprint("Available Metrics"),
+	}, rowConfigAutoMerge)
+
+	if reader.HasField("Names") {
+
+		names := reader.GetField("Names").Interface().([]string)
+
+		for _, name := range names {
+			t.AppendRow(table.Row{
+				name,
+			}, rowConfigAutoMerge)
+		}
+
+	}
+
+	renderAndResetTable(t)
 
 }

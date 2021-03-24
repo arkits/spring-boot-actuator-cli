@@ -34,6 +34,8 @@ func GetAndPrintKnownActuator(inventory Inventory, cmdName string) error {
 		PrettyPrintActuatorHealthResponse(strResponse)
 	case "info":
 		PrettyPrintActuatorInfoResponse(strResponse)
+	case "metrics":
+		PrettyPrintActuatorMetricsResponse(strResponse)
 	case "prometheus":
 		fmt.Println(strResponse)
 	default:

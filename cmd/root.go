@@ -29,6 +29,7 @@ func init() {
 	addCommonFlags(customCmd)
 	addCommonFlags(logfileCmd)
 	addCommonFlags(prometheusCmd)
+	addCommonFlags(metricsCmd)
 
 	// Custom Flags
 	customCmd.Flags().StringP("endpoint", "E", "", "Endpoint prefix of the custom endpoint")
@@ -44,6 +45,7 @@ func init() {
 	rootCmd.AddCommand(customCmd)
 	rootCmd.AddCommand(logfileCmd)
 	rootCmd.AddCommand(prometheusCmd)
+	rootCmd.AddCommand(metricsCmd)
 
 }
 

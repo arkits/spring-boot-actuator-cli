@@ -55,3 +55,7 @@ type ActuatorInfoGitProperties struct {
 		} `json:"commit"`
 	} `json:"total"`
 }
+
+type ActuatorMetricsProperties struct {
+	Names []string `json:"names"`
+}

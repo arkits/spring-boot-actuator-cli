@@ -5,3 +5,20 @@ inventory:
     baseURL: http://localhost:8080
     authorizationHeader: Basic YXJraXRzOmh1bnRlcjI=
     skipVerifySSL: true
+    tags:
+      - demo
+      - local
+
+  - name: demo-service-dev
+    baseURL: https://demo-service-dev
+    authorizationHeader: Basic YXJraXRzOmh1bnRlcjI=
+    tags:
+      - demo
+      - dev
+
+  - name: demo-service-prod
+    baseURL: https://demo-service-prod
+    authorizationHeader: Basic YXJraXRzOmh1bnRlcjI=
+    tags:
+      - demo
+      - prod

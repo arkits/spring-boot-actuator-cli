@@ -22,6 +22,7 @@ var inventoryCmd = &cobra.Command{
 			fmt.Printf("  BaseURL: %s \n", inventory.BaseURL)
 			fmt.Printf("  AuthorizationHeader: %s \n", inventory.AuthorizationHeader)
 			fmt.Printf("  SkipVerifySSL: %v \n", inventory.SkipVerifySSL)
+			fmt.Printf("  Tags: %v \n", inventory.Tags)
 
 			fmt.Println("")
 

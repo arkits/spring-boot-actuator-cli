@@ -17,10 +17,20 @@ The most basic usage of sba-cli is to check the info of a Spring Boot app.
 ```bash
 # ./sba-cli info -U <baseURL to your app>
 $ ./sba-cli info -U http://localhost:8080
-
-{
-    "title": "user-service"
-}
+┌─────────────────────────────┐
+│         SERVICE INFO        │
+├──────────────┬──────────────┤
+│ title        │ demo-service │
+└──────────────┴──────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                          GIT INFO                          │
+├─────────────────┬──────────────────────────────────────────┤
+│ branch          │ main                                     │
+│ commit.time     │ 2021-03-24 01:18:38+0000                 │
+│ commit.describe │ 0.0.3-6-gc6c4cdb-dirty                   │
+│ commit.abbrev   │ c6c4cdb                                  │
+│ commit.full     │ c6c4cdb3932d1b2f28b342fbeb1c3de1d724114e │
+└─────────────────┴──────────────────────────────────────────┘
 ```
 
 sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently supported endpoints are - `actuator`,`info`, `env`, `health`, `logfile`, `prometheus`.
@@ -52,26 +62,82 @@ After defining multiple services in your `config.yaml`, you can refer to a speci
 
 ```bash
 # ./sba-cli info -S <name of a specific service>
-$ ./sba-cli info -S user-service
-
-{
-    "title": "user-service"
-}
+$ ./sba-cli info -S demo-service
+>>> demo-service
+┌─────────────────────────────┐
+│         SERVICE INFO        │
+├──────────────┬──────────────┤
+│ title        │ demo-service │
+└──────────────┴──────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                          GIT INFO                          │
+├─────────────────┬──────────────────────────────────────────┤
+│ branch          │ main                                     │
+│ commit.time     │ 2021-03-24 01:18:38+0000                 │
+│ commit.describe │ 0.0.3-6-gc6c4cdb-dirty                   │
+│ commit.abbrev   │ c6c4cdb                                  │
+│ commit.full     │ c6c4cdb3932d1b2f28b342fbeb1c3de1d724114e │
+└─────────────────┴──────────────────────────────────────────┘
 ```
 
 Multiple specific services can be passed as a comma-separated string. sba-cli will iterate and print the responses for each.
 
 ```bash
-$ ./sba-cli info -S user-service,order-service
-
-{
-    "title": "user-service"
-}
-
-{
-    "title": "order-service"
-}
+$ ./sba-cli info -S demo-service,demo-service-prod
+>>> demo-service
+┌─────────────────────────────┐
+│         SERVICE INFO        │
+├──────────────┬──────────────┤
+│ title        │ demo-service │
+└──────────────┴──────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                          GIT INFO                          │
+├─────────────────┬──────────────────────────────────────────┤
+│ branch          │ main                                     │
+│ commit.time     │ 2021-03-24 01:18:38+0000                 │
+│ commit.describe │ 0.0.3-6-gc6c4cdb-dirty                   │
+│ commit.abbrev   │ c6c4cdb                                  │
+│ commit.full     │ c6c4cdb3932d1b2f28b342fbeb1c3de1d724114e │
+└─────────────────┴──────────────────────────────────────────┘
+>>> demo-service-prod
+┌─────────────────────────────┐
+│         SERVICE INFO        │
+├──────────────┬──────────────┤
+│ title        │ demo-service │
+└──────────────┴──────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                          GIT INFO                          │
+├─────────────────┬──────────────────────────────────────────┤
+│ branch          │ main                                     │
+│ commit.time     │ 2021-03-24 01:18:38+0000                 │
+│ commit.describe │ 0.0.3-6-gc6c4cdb-dirty                   │
+│ commit.abbrev   │ c6c4cdb                                  │
+│ commit.full     │ c6c4cdb3932d1b2f28b342fbeb1c3de1d724114e │
+└─────────────────┴──────────────────────────────────────────┘
 ```
+
+**Inventory Tagging**
+
+Complicated Inventories can be stored and queried easily with Tags. Each Inventory entry can have a list of string tags which can then be matched during runtime -
+
+```bash
+$ ./sba-cli health -T dev,prod
+>>> demo-service-dev
+┌─────────────────┐
+│      HEALTH     │
+├────────┬────────┤
+│ status │ UP     │
+└────────┴────────┘
+
+>>> demo-service-prod
+┌─────────────────┐
+│      HEALTH     │
+├────────┬────────┤
+│ status │ UP     │
+└────────┴────────┘
+```
+
+Refer to [config.sample.yml](./config.sample.yml) for additional details.
 
 ### Debugging with Verbose
 

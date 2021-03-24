@@ -23,6 +23,7 @@ type Inventory struct {
 	BaseURL             string
 	AuthorizationHeader string
 	SkipVerifySSL       bool
+	Tags                []string
 }
 
 // CLIConfig stores the parsed Config
@@ -91,6 +92,32 @@ func SetupConfig(cmd *cobra.Command) {
 
 	}
 
+	// If the specific flag is passed, then we use that to build the Inventory
+	if LookupFlagInCmd("tag", cmd) {
+
+		// Tag flag's parsing logic...
+		// Get the input string
+		inputStr := cmd.Flags().Lookup("tag").Value.String()
+
+		// Multiple name can be pass with a ','
+		taqs := strings.Split(inputStr, ",")
+
+		var specificInventory []Inventory
+
+		// Iterate through each tag
+		for _, tag := range taqs {
+
+			// Get all the inventories that match the tag
+			inventories := getAllInventoriesByTag(tag)
+
+			specificInventory = mergeInventories(specificInventory, inventories)
+
+		}
+
+		CLIConfig.Inventory = specificInventory
+
+	}
+
 	// Check if flags for impromptu definition of an Inventory were passed
 	// Assume that if url was passed, then it is an impromptu definition
 	if LookupFlagInCmd("url", cmd) {
@@ -135,6 +162,7 @@ func LookupFlagInCmd(flagName string, cmd *cobra.Command) bool {
 	return true
 }
 
+// getInventoryByName is a utility function to retrive an Inventory based on the Name
 func getInventoryByName(name string) Inventory {
 
 	var inventory Inventory
@@ -146,5 +174,51 @@ func getInventoryByName(name string) Inventory {
 	}
 
 	return inventory
+
+}
+
+// getAllInventoriesByTag is a utility function to retrive an Inventory based on a single Tag
+func getAllInventoriesByTag(targetTag string) []Inventory {
+
+	var inventories []Inventory
+
+	// Iterate through the Inventories
+	for _, i := range CLIConfig.Inventory {
+
+		// Iterate through the each tag in a single Inventory
+		for _, tag := range i.Tags {
+
+			if tag == targetTag {
+				inventories = append(inventories, i)
+				break
+			}
+
+		}
+	}
+
+	return inventories
+
+}
+
+// mergeInventories is a utility function to merge 2 Slices of Inventories without adding duplicates
+func mergeInventories(oldInventory []Inventory, newInventory []Inventory) []Inventory {
+
+	mergedInventory := oldInventory
+
+	for _, newI := range newInventory {
+
+		for _, oldI := range newInventory {
+
+			// assumption that Name will be unique
+			if oldI.Name != newI.Name {
+				mergedInventory = append(mergedInventory, newI)
+				break
+			}
+
+		}
+
+	}
+
+	return mergedInventory
 
 }

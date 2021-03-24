@@ -44,7 +44,7 @@ func MakeHTTPCall(requestMethod string, requestURL string, authorizationHeader s
 
 	// Handle skipping SSL verification
 	if skipVerifySSL {
-		VLog(">>> Skipping SSL Verification")
+		VLog("[request] Skipping SSL Verification")
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}

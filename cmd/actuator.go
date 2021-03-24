@@ -43,7 +43,9 @@ func handleKnownActuatorCmd(cmd *cobra.Command, args []string) {
 	domain.SetupConfig(cmd)
 
 	for _, inventory := range domain.CLIConfig.Inventory {
+		domain.PrintInventoryHeader(inventory)
 		domain.GetAndPrintKnownActuator(inventory, cmd.Name())
+		domain.PrintInventoryFooter(inventory)
 	}
 
 }

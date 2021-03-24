@@ -10,6 +10,14 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
+func PrintInventoryHeader(inventory Inventory) {
+	fmt.Printf(">>> %v \n", inventory.Name)
+}
+
+func PrintInventoryFooter(inventory Inventory) {
+	fmt.Print("\n")
+}
+
 // PrettyPrintJSON prints a JSON string in a pretty format using the colorjson library
 func PrettyPrintJSON(jsonStr string) {
 

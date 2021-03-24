@@ -26,6 +26,9 @@ management:
   info:
     git.mode: FULL
 
+info:
+  title: demo-service
+
 logging:
   file:
     name: logs/logfile.log

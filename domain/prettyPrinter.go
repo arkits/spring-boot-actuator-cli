@@ -385,13 +385,17 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 		}
 	}
 
-	t.AppendHeader(table.Row{
-		text.Bold.Sprint("Raw /actuator/info Response"),
-	}, rowConfigAutoMerge)
+	if CLIConfig.Verbose {
 
-	t.AppendRow(table.Row{
-		PrettyJSON(actuatorResponse),
-	}, rowConfigAutoMerge)
+		t.AppendHeader(table.Row{
+			text.Bold.Sprint("Raw /actuator/info Response"),
+		}, rowConfigAutoMerge)
+
+		t.AppendRow(table.Row{
+			PrettyJSON(actuatorResponse),
+		}, rowConfigAutoMerge)
+
+	}
 
 	renderAndResetTable(t)
 

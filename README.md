@@ -33,7 +33,7 @@ $ ./sba-cli info -U http://localhost:8080
 └─────────────────┴──────────────────────────────────────────┘
 ```
 
-sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently supported endpoints are - `actuator`,`info`, `env`, `health`, `logfile`, `prometheus`.
+sba-cli aims to provides a more legible output for most of the default Actuator endpoints. Currently supported endpoints are - `actuator`,`info`, `env`, `health`, `logfile`, `prometheus`, `metrics`.
 
 Users can still reach unsupported or custom endpoints and make use of the Inventory functionality by using the `custom` command.
 
@@ -118,7 +118,7 @@ $ ./sba-cli info -S demo-service,demo-service-prod
 
 **Inventory Tagging**
 
-Complicated Inventories can be stored and queried easily with Tags. Each Inventory entry can have a list of string tags which can then be matched during runtime -
+Complicated Inventories can be managed and queried easily with Tags. Each Inventory entry can have a list of string tags associated to it. During runtime, pass a query tag (multiple as a comma-separated string) and sba-cli will match the Inventory appropriately. Refer to [config.sample.yml](./config.sample.yml) for additional details.
 
 ```bash
 $ ./sba-cli health -T dev,prod
@@ -136,8 +136,6 @@ $ ./sba-cli health -T dev,prod
 │ status │ UP     │
 └────────┴────────┘
 ```
-
-Refer to [config.sample.yml](./config.sample.yml) for additional details.
 
 ### Debugging with Verbose
 

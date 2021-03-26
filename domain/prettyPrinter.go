@@ -73,8 +73,8 @@ func PrettyPrintActuatorEnvResponse(actuatorEnvResponseStr string) {
 
 	// propertySources table
 	t.AppendHeader(table.Row{
-		text.Bold.Sprint("Property Sources"),
-	})
+		text.Bold.Sprint("Property Sources"), text.Bold.Sprint("Property Sources"),
+	}, rowConfigAutoMerge)
 
 	width, _ := GetTerminalSize()
 	col1WidthMax := width / 3

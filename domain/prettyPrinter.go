@@ -396,6 +396,44 @@ func PrettyPrintActuatorInfoResponse(actuatorResponse string) {
 		}
 	}
 
+	// Parse Build info
+	if reader.HasField("Build") {
+
+		buildInfo := reader.GetField("Build").Interface().(map[string]interface{})
+
+		if len(buildInfo) == 0 {
+			VLog("[pp] buildInfo was empty... Skipping parsing of buildInfo")
+		} else {
+
+			t.AppendHeader(table.Row{
+				text.Bold.Sprint("Build Info"), text.Bold.Sprint("Build Info"),
+			}, rowConfigAutoMerge)
+
+			t.AppendSeparator()
+
+			for k, v := range buildInfo {
+				switch v.(type) {
+				case string:
+					// Sample -
+					// "build": {
+					// 	"artifact": "demo-service",
+					// 	"name": "demo-service",
+					// 	"time": "2021-03-29T21:47:03.802Z",
+					// 	"version": "0.0.1-SNAPSHOT",
+					// 	"group": "xyz.archit"
+					// }
+					t.AppendRow(table.Row{
+						fmt.Sprintf("%s", k), fmt.Sprintf("%s", v),
+					}, rowConfigAutoMerge)
+				}
+			}
+
+			renderAndResetTable(t)
+
+		}
+
+	}
+
 	if CLIConfig.Verbose {
 
 		t.AppendHeader(table.Row{
